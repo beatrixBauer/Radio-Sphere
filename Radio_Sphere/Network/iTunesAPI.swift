@@ -1,3 +1,11 @@
+//
+//  iTunesAPI.swift
+//  Radio_Sphere
+//
+//  Created by Beatrix Bauer on 22.02.25.
+//
+
+
 import Foundation
 
 class iTunesAPI {
@@ -13,7 +21,7 @@ class iTunesAPI {
         }
 
         URLSession.shared.dataTask(with: url) { data, response, error in
-            if let error = error {
+            if error != nil {
                 completion(nil)
                 return
             }
@@ -28,7 +36,10 @@ class iTunesAPI {
                    let results = json["results"] as? [[String: Any]],
                    let artworkUrl = results.first?["artworkUrl100"] as? String {
                     
-                    let highResArtworkUrl = artworkUrl.replacingOccurrences(of: "100x100", with: "600x600")
+                    let highResArtworkUrl = artworkUrl
+                        .replacingOccurrences(of: "100x100", with: "1200x1200")
+                        .replacingOccurrences(of: "600x600", with: "1200x1200")
+
                     completion(URL(string: highResArtworkUrl))
                     
                 } else {

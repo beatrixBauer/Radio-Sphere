@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		81A7920A2D68857D00004664 /* FRadioPlayer in Frameworks */ = {isa = PBXBuildFile; productRef = 81A792092D68857D00004664 /* FRadioPlayer */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		81A791E82D68853B00004664 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				81A7920A2D68857D00004664 /* FRadioPlayer in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +117,7 @@
 			);
 			name = Radio_Sphere;
 			packageProductDependencies = (
+				81A792092D68857D00004664 /* FRadioPlayer */,
 			);
 			productName = Radio_Sphere;
 			productReference = 81A791D72D68853900004664 /* Radio_Sphere.app */;
@@ -195,6 +201,9 @@
 			);
 			mainGroup = 81A791CE2D68853900004664;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				81A792082D68857D00004664 /* XCRemoteSwiftPackageReference "FRadioPlayer" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 81A791D82D68853900004664 /* Products */;
 			projectDirPath = "";
@@ -399,6 +408,7 @@
 				DEVELOPMENT_TEAM = GA4HW6BT6B;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Radio-Sphere-Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -428,6 +438,7 @@
 				DEVELOPMENT_TEAM = GA4HW6BT6B;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Radio-Sphere-Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -558,6 +569,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		81A792082D68857D00004664 /* XCRemoteSwiftPackageReference "FRadioPlayer" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/fethica/FRadioPlayer";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.1.22;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		81A792092D68857D00004664 /* FRadioPlayer */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 81A792082D68857D00004664 /* XCRemoteSwiftPackageReference "FRadioPlayer" */;
+			productName = FRadioPlayer;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 81A791CF2D68853900004664 /* Project object */;
 }

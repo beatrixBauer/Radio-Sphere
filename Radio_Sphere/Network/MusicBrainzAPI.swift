@@ -1,30 +1,40 @@
+//
+//  MusicBrainzAPI.swift
+//  Radio_Sphere
+//
+//  Created by Beatrix Bauer on 22.02.25.
+//
+
+
 import Foundation
 
 class MusicBrainzAPI {
-    // Setzt den User-Agent für die Anfrage
+    static let shared = MusicBrainzAPI()
+    
     private let userAgent = "Radio_Sphere/0.1 (beatrix.bauer@gmail.com)"
-
-    // Funktion zum Abrufen des Albumcovers für ein Lied
+    
     func getAlbumCover(artistName: String, trackTitle: String, completion: @escaping (URL?) -> Void) {
-        // Setze die URL für die MusicBrainz API (Suche nach Aufnahmen)
-        let baseUrl = "https://musicbrainz.org/ws/2/recording"
-        var components = URLComponents(string: baseUrl)
-        components?.queryItems = [
-            URLQueryItem(name: "artist", value: artistName),
-            URLQueryItem(name: "recording", value: trackTitle),
-            URLQueryItem(name: "fmt", value: "json")
-        ]
-        
-        guard let url = components?.url else {
-            print("Fehler: URL konnte nicht erstellt werden")
+        // URL-Encoding der Suchbegriffe
+        guard let encodedArtist = artistName.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
+              let encodedTrack = trackTitle.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
+            print("Fehler beim Encoding der Suchbegriffe")
             completion(nil)
             return
         }
         
+        let urlString = "https://musicbrainz.org/ws/2/recording/?query=artist:\(encodedArtist)%20AND%20recording:\(encodedTrack)&fmt=json"
+        
+        guard let url = URL(string: urlString) else {
+            print("Fehler: URL konnte nicht erstellt werden")
+            completion(nil)
+            return
+        }
+
         var request = URLRequest(url: url)
         request.setValue(userAgent, forHTTPHeaderField: "User-Agent")
         
-        // Abrufen der Daten von der MusicBrainz API
+        print("Anfrage an MusicBrainz: \(urlString)")
+        
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
                 print("Fehler bei API-Request: \(error.localizedDescription)")
@@ -38,16 +48,14 @@ class MusicBrainzAPI {
                 return
             }
             
-            // Verarbeiten der Antwort
             do {
                 if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
-                   let recordings = json["recording-list"] as? [[String: Any]],
-                   !recordings.isEmpty {
+                   let recordings = json["recordings"] as? [[String: Any]], !recordings.isEmpty {
                     
-                    // Holen der Release-IDs aus der Antwort
                     var releaseIds: [String] = []
+                    
                     for recording in recordings {
-                        if let releases = recording["release-list"] as? [[String: Any]] {
+                        if let releases = recording["releases"] as? [[String: Any]] {
                             for release in releases {
                                 if let releaseId = release["id"] as? String {
                                     releaseIds.append(releaseId)
@@ -55,12 +63,13 @@ class MusicBrainzAPI {
                             }
                         }
                     }
-                    
-                    // Duplikate entfernen
-                    let uniqueReleaseIds = Set(releaseIds)
-                    
-                    // Das Albumcover aus dem CoverArt Archive holen
-                    self.getCoverFromCoverArtArchive(releaseIds: Array(uniqueReleaseIds), completion: completion)
+
+                    if let firstReleaseId = releaseIds.first {
+                        self.getCoverFromCoverArtArchive(releaseId: firstReleaseId, completion: completion)
+                    } else {
+                        print("Keine Release-ID gefunden")
+                        completion(nil)
+                    }
                     
                 } else {
                     print("Fehler: Keine Ergebnisse von MusicBrainz gefunden")
@@ -73,34 +82,35 @@ class MusicBrainzAPI {
         }.resume()
     }
     
-    // Funktion zum Abrufen des Covers vom CoverArt Archive
-    private func getCoverFromCoverArtArchive(releaseIds: [String], completion: @escaping (URL?) -> Void) {
-        for releaseId in releaseIds {
-            let url = "https://coverartarchive.org/release/\(releaseId)/front"
-            if let requestUrl = URL(string: url) {
-                // Anfrage an das CoverArt Archive senden
-                URLSession.shared.dataTask(with: requestUrl) { data, response, error in
-                    if let error = error {
-                        print("Fehler beim Abrufen des Covers: \(error.localizedDescription)")
-                        continue
-                    }
-                    
-                    guard let response = response as? HTTPURLResponse,
-                          response.statusCode == 307,  // Prüft, ob ein Redirect erfolgt
-                          let location = response.allHeaderFields["Location"] as? String,
-                          let artworkUrl = URL(string: location) else {
-                        print("Kein Albumcover gefunden oder Fehler bei der Antwort")
-                        continue
-                    }
-                    
-                    // Gebe die URL des Covers zurück
-                    completion(artworkUrl)
-                    return
-                }.resume()
-            }
+    private func getCoverFromCoverArtArchive(releaseId: String, completion: @escaping (URL?) -> Void) {
+        let url = "https://coverartarchive.org/release/\(releaseId)/front"
+        
+        guard let requestUrl = URL(string: url) else {
+            completion(nil)
+            return
         }
         
-        // Wenn kein Cover gefunden wird
-        completion(nil)
+        URLSession.shared.dataTask(with: requestUrl) { data, response, error in
+            if let error = error {
+                print("Fehler beim Abrufen des Covers: \(error.localizedDescription)")
+                completion(nil)
+                return
+            }
+            
+            guard let response = response as? HTTPURLResponse else {
+                print("Ungültige Serverantwort")
+                completion(nil)
+                return
+            }
+            
+            if response.statusCode == 200 {
+                print("Cover gefunden: \(requestUrl)")
+                completion(requestUrl)
+            } else {
+                print("Kein Albumcover verfügbar (Status: \(response.statusCode))")
+                completion(nil)
+            }
+        }.resume()
     }
 }
+
