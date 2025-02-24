@@ -23,15 +23,6 @@ struct DataManager {
             handleAPIResponse(result, completion: completion)
         }
     }
-    
-    /// Sucht Radiosender nach Namen
-    static func searchStations(query: String, completion: @escaping StationsCompletion) {
-        api.searchStations(query: query) { stations in
-            DispatchQueue.main.async {
-                completion(.success(stations))
-            }
-        }
-    }
 
 
     /// Verarbeitet die API-Antwort und dekodiert `RadioStation`

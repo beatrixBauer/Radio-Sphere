@@ -31,6 +31,8 @@ class StationsManager: ObservableObject, FRadioPlayerDelegate {
     @Published var selectedCountry: String = "Alle"
     @Published var isPlaying = false
 
+    private let radioAPI = RadioAPI()
+    
     private let player = FRadioPlayer.shared
     private var currentOffset = 0
     private var isFetching = false
@@ -66,29 +68,24 @@ class StationsManager: ObservableObject, FRadioPlayerDelegate {
     
     /// sucht nach Stationen mit Suchtext
     func searchStations() {
-           guard !searchText.isEmpty else {
-               searchedStations = []
-               return
-           }
+        guard !searchText.isEmpty else {
+            searchedStations = []
+            print("Suchfeld ist leer, Liste zurückgesetzt.")
+            return
+        }
 
-           isLoading = true
-           errorMessage = nil
+        print("🔍 Suche gestartet für: \(searchText)")
 
-           DataManager.searchStations(query: searchText) { [weak self] result in
-               DispatchQueue.main.async {
-                   guard let self = self else { return }
-                   self.isLoading = false
-                   
-                   switch result {
-                   case .success(let stations):
-                       self.searchedStations = stations
-                   case .failure(let error):
-                       self.errorMessage = "Fehler: \(error.localizedDescription)"
-                   }
-               }
-           }
-       }
-    
+        radioAPI.searchStations(query: searchText) { stations in
+            DispatchQueue.main.async {
+                print("API hat \(stations.count) Sender gefunden")
+                self.searchedStations = stations
+                self.objectWillChange.send() // Erzwingt ein UI-Update
+            }
+        }
+    }
+
+
     ///Filter- / Sortierfunktion
     func filteredStations() -> [RadioStation]{
         var results = searchText.isEmpty ? stations : searchedStations

@@ -9,14 +9,13 @@ import SwiftUI
 
 struct ContentView: View {
     @StateObject private var manager = StationsManager.shared
-    @State var searchText = ""
-    @State var alphabetical = false
-
 
     var body: some View {
         NavigationStack {
-            List(manager.stations.indices, id: \.self) { index in
-                let station = manager.stations[index]
+            let stations = manager.filteredStations()
+            
+            List(stations.indices, id: \.self) { index in
+                let station = stations[index]
                 NavigationLink(destination: PlayerView(station: station)) {
                     StationCardView(station: station)
                 }
@@ -24,7 +23,7 @@ struct ContentView: View {
                 .listRowInsets(EdgeInsets())
                 .listStyle(.plain)
             }
-            .searchable(text: $searchText)
+            .searchable(text: $manager.searchText, prompt: "Sender oder Genre suchen")
             .navigationTitle("Radiosender")
             .onAppear {
                 manager.fetchStations()

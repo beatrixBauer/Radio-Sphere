@@ -45,7 +45,7 @@ class RadioViewModel: ObservableObject, FRadioPlayerDelegate {
     }
     
     // Suchfunktion für Sender
-    func searchStations(query: String) {
+    /*func searchStations(query: String) {
         isLoading = true
         errorMessage = nil
         
@@ -60,7 +60,7 @@ class RadioViewModel: ObservableObject, FRadioPlayerDelegate {
                 }
             }
         }
-    }
+    }*/
     
     // Startet das Abspielen eines Radiosenders
     func playStation(_ station: RadioStation) {

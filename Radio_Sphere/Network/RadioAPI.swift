@@ -7,24 +7,25 @@
 import Foundation
 
 class RadioAPI {
-    private let baseURL = "https://de1.api.radio-browser.info/json/stations/search"
+    private let baseURL = "https://de1.api.radio-browser.info/json/stations"
 
     /// Holt die Top-Radiosender mit Song-Metadaten für Deutschland
-    func fetchStations(offset: Int, completion: @escaping (Result<Data, Error>) -> Void) {
+    func fetchStations(offset: Int, searchQuery: String? = nil, completion: @escaping (Result<Data, Error>) -> Void) {
         print("Anfrage wird vorbereitet...")
+        
+        let userCountryCode = Locale.current.region?.identifier ?? "DE"
 
-        var components = URLComponents(string: baseURL)
-        components?.queryItems = [
-            URLQueryItem(name: "limit", value: "100"),
-            //URLQueryItem(name: "tag", value: "pop"), // Nur Pop-Sender
-            //URLQueryItem(name: "offset", value: "\(offset)"),
+        var components = URLComponents(string: "\(baseURL)/search")
+
+        let queryItems = [
             URLQueryItem(name: "order", value: "clickcount"),
-            URLQueryItem(name: "reverse", value: "true"),
-            URLQueryItem(name: "countrycode", value: "DE"),
+            URLQueryItem(name: "countrycode", value: userCountryCode),
             URLQueryItem(name: "hidebroken", value: "true"),
             URLQueryItem(name: "lastcheckok", value: "1"), // Nur aktive Sender
-            URLQueryItem(name: "has_extended_info", value: "true") // Nur Sender mit Song-Metadaten
+            URLQueryItem(name: "has_extended_info", value: "true") // Sender mit Song-Metadaten
         ]
+
+        components?.queryItems = queryItems
 
         guard let urlString = components?.url?.absoluteString else {
             completion(.failure(DataError.urlNotValid))
@@ -36,53 +37,34 @@ class RadioAPI {
         performRequest(urlString: urlString, completion: completion)
     }
     
-    /// Suche nach Radiosendern
     func searchStations(query: String, completion: @escaping ([RadioStation]) -> Void) {
-        let urlString = "\(baseURL)/search?name=\(query)&limit=50"
-        guard let url = URL(string: urlString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "") else { return }
-
-        URLSession.shared.dataTask(with: url) { data, _, error in
-            if let error = error {
-                print("Fehler bei der API-Suche: \(error.localizedDescription)")
-                return
-            }
-            guard let data = data else { return }
-
-            do {
-                let decodedData = try JSONDecoder().decode([RadioStation].self, from: data)
-                DispatchQueue.main.async {
-                    completion(decodedData)
-                }
-            } catch {
-                print("JSON-Fehler: \(error)")
-            }
-        }.resume()
-    }
-   /* func searchStations(query: String, completion: @escaping ([RadioStation]) -> Void) {
         let encodedQuery = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-        let urlString = "\(baseURL)/search?name=\(encodedQuery)&limit=100"
+        let urlString = "\(baseURL)/search?name=\(encodedQuery)&limit=200"
         
+        guard let url = URL(string: urlString) else {
+            print("Fehler: URL konnte nicht erstellt werden.")
+            return
+        }
+
+        print("API-Aufruf gestartet mit URL: \(url.absoluteString)")
 
         performRequest(urlString: urlString) { result in
             switch result {
             case .success(let data):
                 do {
-                    // JSON-Daten dekodieren
                     let decodedData = try JSONDecoder().decode([RadioStation].self, from: data)
-
-                    // Ergebnis auf dem Hauptthread zurückgeben
                     DispatchQueue.main.async {
                         completion(decodedData)
                     }
                 } catch {
                     print("JSON-Fehler: \(error)")
                 }
-
             case .failure(let error):
                 print("Fehler bei der API-Suche: \(error.localizedDescription)")
             }
         }
-    }*/
+    }
+
 
     /// Generische Methode für API-Anfragen
     private func performRequest(urlString: String, completion: @escaping (Result<Data, Error>) -> Void) {
