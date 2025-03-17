@@ -1,5 +1,5 @@
 //
-//  VolumeObserver.swift
+//  AudioManager.swift
 //  Radio_Sphere
 //
 //  Created by Beatrix Bauer on 23.02.25.
@@ -10,7 +10,7 @@ import MediaPlayer
 import AVFoundation
 import Combine
 
-class VolumeObserver: NSObject, ObservableObject {
+class AudioManager: NSObject, ObservableObject {
     @Published var volume: Float = AVAudioSession.sharedInstance().outputVolume
     private var audioSession = AVAudioSession.sharedInstance()
     private var volumeView = MPVolumeView()
