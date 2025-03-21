@@ -1,3 +1,11 @@
+//
+//  SleepTimerView.swift
+//  Radio_Sphere
+//
+//  Created by Beatrix Bauer on 17.03.25.
+//
+
+
 import SwiftUI
 
 struct SleepTimerView: View {
@@ -19,10 +27,10 @@ struct SleepTimerView: View {
                 stopTimer()
             }
         } label: {
-            Image(systemName: "moon.fill") // 🌙 Sleep-Timer Icon
+            Image(systemName: "timer") // Sleep-Timer Icon
                 .resizable()
                 .frame(width: 30, height: 30)
-                .foregroundColor(selectedTime != nil ? .blue : .gray)
+                .foregroundColor(selectedTime != nil ? .goldorange : .gray)
                 .shadow(radius: 4)
         }
         .onDisappear {
@@ -42,11 +50,11 @@ struct SleepTimerView: View {
             } else {
                 stopTimer()
                 manager.pausePlayback() // Musik stoppen
-                print("🛑 Sleep-Timer abgelaufen: Musik gestoppt!")
+                print("Sleep-Timer abgelaufen: Musik gestoppt!")
             }
         }
 
-        print("⏳ Sleep-Timer gesetzt auf \(minutes) Minuten")
+        print("Sleep-Timer gesetzt auf \(minutes) Minuten")
     }
 
     /// Stoppt den Timer
@@ -55,6 +63,10 @@ struct SleepTimerView: View {
         timer = nil
         selectedTime = nil
         remainingTime = nil
-        print("❌ Sleep-Timer gestoppt")
+        print("Sleep-Timer gestoppt")
     }
+}
+
+#Preview {
+    SleepTimerView()
 }

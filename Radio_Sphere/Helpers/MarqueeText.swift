@@ -28,7 +28,7 @@ struct MarqueeText: View {
                         let textWidth = textWidth(text: text, font: UIFont.systemFont(ofSize: 17))
                         let containerWidth = geometry.size.width
 
-                        if textWidth > containerWidth {
+                        if textWidth > containerWidth * 0.90 {
                             offset = containerWidth / 2  // Startposition mittig setzen
                             withAnimation(Animation.linear(duration: speed * 1.5).repeatForever(autoreverses: true).delay(delay)) {
                                 offset = -textWidth/2 // Verschiebung nach links
@@ -38,7 +38,7 @@ struct MarqueeText: View {
             }
             .frame(width: geometry.size.width, height: geometry.size.height, alignment: .center)
         }
-        .frame(height: 25)
+        .frame(height: 40)
         .clipped()
         .padding(.leading, 10)
     }

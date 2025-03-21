@@ -1,18 +1,18 @@
 //
-//  SwiftUIView.swift
+//  SearchView.swift
 //  Radio_Sphere
 //
-//  Created by Beatrix Bauer on 28.02.25.
+//  Created by Beatrix Bauer on 20.03.25.
 //
 
 import SwiftUI
 
-struct SwiftUIView: View {
+struct SearchView: View {
     var body: some View {
         Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
     }
 }
 
 #Preview {
-    SwiftUIView()
+    SearchView()
 }

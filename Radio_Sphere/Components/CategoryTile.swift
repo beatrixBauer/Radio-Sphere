@@ -1,3 +1,11 @@
+//
+//  CategoryTile.swift
+//  Radio_Sphere
+//
+//  Created by Beatrix Bauer on 28.02.25.
+//
+import SwiftUI
+
 struct CategoryTile: View {
     let title: String
     
