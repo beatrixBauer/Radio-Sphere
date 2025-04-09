@@ -29,6 +29,7 @@ struct SearchView: View {
                                 isActive: station.id.lowercased() == manager.currentStation?.id.lowercased()
                             )
                             .listRowBackground(Color.clear)
+                            .listRowInsets(EdgeInsets())
                         }
                     }
                     .listStyle(.plain)
