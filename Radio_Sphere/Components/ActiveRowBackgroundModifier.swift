@@ -1,3 +1,11 @@
+//
+//  ActiveRowBackgroundModifier.swift
+//  Radio_Sphere
+//
+//  Created by Beatrix Bauer on 09.04.25.
+//
+
+
 import SwiftUI
 
 struct ActiveRowBackgroundModifier: ViewModifier {
@@ -10,7 +18,7 @@ struct ActiveRowBackgroundModifier: ViewModifier {
                     if isActive {
                         // Hervorhebung, wenn die Zeile aktiv ist
                         LinearGradient(
-                            gradient: Gradient(colors: [Color.blue.opacity(0.2), Color.blue.opacity(0.05)]),
+                            gradient: Gradient(colors: [Color.itunespink.opacity(0.2), Color.blue.opacity(0.05)]),
                             startPoint: .leading,
                             endPoint: .trailing
                         )

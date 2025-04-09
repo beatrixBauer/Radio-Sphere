@@ -39,30 +39,9 @@
 		81FBB0652D96EE6B0035771A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		81B76FAC2DA670880091B342 /* Exceptions for "Radio_Sphere" folder in "Radio_SphereTests" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Ressources/stations.json,
-			);
-			target = 81A791E62D68853B00004664 /* Radio_SphereTests */;
-		};
-		81B76FAD2DA670880091B342 /* Exceptions for "Radio_Sphere" folder in "Radio_SphereUITests" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Ressources/stations.json,
-			);
-			target = 81A791F02D68853B00004664 /* Radio_SphereUITests */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		81A791D92D68853900004664 /* Radio_Sphere */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				81B76FAC2DA670880091B342 /* Exceptions for "Radio_Sphere" folder in "Radio_SphereTests" target */,
-				81B76FAD2DA670880091B342 /* Exceptions for "Radio_Sphere" folder in "Radio_SphereUITests" target */,
-			);
 			path = Radio_Sphere;
 			sourceTree = "<group>";
 		};

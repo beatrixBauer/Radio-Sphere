@@ -33,8 +33,8 @@ struct StationRow: View {
         
         return NavigationLink(destination: playerView) {
             StationCardView(station: station)
-                .background(isActive ? Color.blue.opacity(0.2) : Color.clear)
         }
+        .activeRowBackground(isActive: isActive)
         .background(Color.clear)
         .padding(.horizontal)
         .listRowInsets(EdgeInsets())
