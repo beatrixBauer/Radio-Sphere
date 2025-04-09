@@ -2,12 +2,14 @@
 //  LocationManager.swift
 //  Radio_Sphere
 //
-//  Created by Beatrix Bauer on 02.03.25.
+//  Created by Beatrix Bauer on 13.04.25.
 //
 
 
 import Foundation
 import CoreLocation
+
+// MARK: LocationManager verwaltet die Abfrage der lokalen Radiosender, basierend auf dem aktuellen Standort
 
 class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     

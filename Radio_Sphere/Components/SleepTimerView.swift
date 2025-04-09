@@ -2,11 +2,12 @@
 //  SleepTimerView.swift
 //  Radio_Sphere
 //
-//  Created by Beatrix Bauer on 17.03.25.
+//  Created by Beatrix Bauer on 17.04.25.
 //
 
-
 import SwiftUI
+
+// MARK: Sleeptimer-Button in der PlayerView
 
 struct SleepTimerView: View {
     @State private var selectedTime: Int? = nil
@@ -14,7 +15,8 @@ struct SleepTimerView: View {
     @State private var timer: Timer? = nil
     @StateObject private var manager = StationsManager.shared
 
-    let sleepDurations = [5, 10, 15, 30, 60] // Minutenauswahl
+    let sleepDurations = [5, 10, 15, 30, 60] // Auswahl in Minuten
+    var iconSize: CGFloat = 30  // Standardgröße für das Timer-Icon
 
     var body: some View {
         Menu {
@@ -27,29 +29,31 @@ struct SleepTimerView: View {
                 stopTimer()
             }
         } label: {
-            Image(systemName: "timer") // Sleep-Timer Icon
+            Image(systemName: "timer")
                 .resizable()
-                .frame(width: 30, height: 30)
-                .foregroundColor(selectedTime != nil ? .goldorange : .gray)
+                .frame(width: iconSize, height: iconSize)
+                .foregroundColor(manager.isSleepTimerActive ? .goldorange : .gray)
                 .shadow(radius: 4)
         }
-        .onDisappear {
-            stopTimer() // Falls die View verschwindet, Timer beenden
+        .onChange(of: manager.isPlaying) {
+            if !manager.isPlaying {
+                stopTimer()
+            }
         }
     }
 
-    /// Startet den Timer
     private func startTimer(minutes: Int) {
-        stopTimer() // Falls bereits ein Timer läuft, stoppen
+        stopTimer()
         selectedTime = minutes
         remainingTime = minutes * 60
+        manager.isSleepTimerActive = true
 
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
             if let timeLeft = remainingTime, timeLeft > 0 {
                 remainingTime = timeLeft - 1
             } else {
                 stopTimer()
-                manager.pausePlayback() // Musik stoppen
+                manager.pausePlayback()
                 print("Sleep-Timer abgelaufen: Musik gestoppt!")
             }
         }
@@ -57,12 +61,12 @@ struct SleepTimerView: View {
         print("Sleep-Timer gesetzt auf \(minutes) Minuten")
     }
 
-    /// Stoppt den Timer
     private func stopTimer() {
         timer?.invalidate()
         timer = nil
         selectedTime = nil
         remainingTime = nil
+        manager.isSleepTimerActive = false
         print("Sleep-Timer gestoppt")
     }
 }

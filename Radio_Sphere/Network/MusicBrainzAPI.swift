@@ -2,115 +2,141 @@
 //  MusicBrainzAPI.swift
 //  Radio_Sphere
 //
-//  Created by Beatrix Bauer on 22.02.25.
+//  Created by Beatrix Bauer on 22.04.25.
 //
 
 
 import Foundation
+
+// Codable-Modelle für die MusicBrainz-Antwort
+struct MusicBrainzResponse: Codable {
+    let recordings: [Recording]
+}
+
+struct Recording: Codable {
+    let releases: [Release]?
+}
+
+struct Release: Codable {
+    let id: String
+}
+
+enum MusicBrainzError: Error {
+    case invalidURL
+    case noData
+    case decodingError(Error)
+    case noRecordingsFound
+    case noReleaseIDFound
+    case networkError(Error)
+}
 
 class MusicBrainzAPI {
     static let shared = MusicBrainzAPI()
     
     private let userAgent = "Radio_Sphere/0.1 (beatrix.bauer@gmail.com)"
     
-    func getAlbumCover(artistName: String, trackTitle: String, completion: @escaping (URL?) -> Void) {
-        // URL-Encoding der Suchbegriffe
-        guard let encodedArtist = artistName.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
-              let encodedTrack = trackTitle.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
-            print("Fehler beim Encoding der Suchbegriffe")
-            completion(nil)
-            return
-        }
+    // MARK: Fragt das Album-Cover bei MusicBrainz ab, falls verfügbar
+    func getAlbumCover(artistName: String, trackTitle: String, completion: @escaping (Result<URL, MusicBrainzError>) -> Void) {
         
-        let urlString = "https://musicbrainz.org/ws/2/recording/?query=artist:\(encodedArtist)%20AND%20recording:\(encodedTrack)&fmt=json"
+        // URLComponents für eine sichere URL-Erstellung
+        var components = URLComponents(string: "https://musicbrainz.org/ws/2/recording/")!
+        let queryItems = [
+            URLQueryItem(name: "query", value: "artist:\(artistName) AND recording:\(trackTitle)"),
+            URLQueryItem(name: "fmt", value: "json")
+        ]
+        components.queryItems = queryItems
         
-        guard let url = URL(string: urlString) else {
+        guard let url = components.url else {
             print("Fehler: URL konnte nicht erstellt werden")
-            completion(nil)
+            completion(.failure(.invalidURL))
             return
         }
-
+        
         var request = URLRequest(url: url)
         request.setValue(userAgent, forHTTPHeaderField: "User-Agent")
         
-        print("Anfrage an MusicBrainz: \(urlString)")
+        print("Anfrage an MusicBrainz: \(url.absoluteString)")
         
         URLSession.shared.dataTask(with: request) { data, response, error in
+            // Fehler beim Netzwerkabruf
             if let error = error {
-                print("Fehler bei API-Request: \(error.localizedDescription)")
-                completion(nil)
+                print("Netzwerkfehler: \(error.localizedDescription)")
+                completion(.failure(.networkError(error)))
                 return
             }
             
             guard let data = data else {
                 print("Fehler: Keine Daten erhalten")
-                completion(nil)
+                completion(.failure(.noData))
                 return
             }
             
             do {
-                if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
-                   let recordings = json["recordings"] as? [[String: Any]], !recordings.isEmpty {
-                    
-                    var releaseIds: [String] = []
-                    
-                    for recording in recordings {
-                        if let releases = recording["releases"] as? [[String: Any]] {
-                            for release in releases {
-                                if let releaseId = release["id"] as? String {
-                                    releaseIds.append(releaseId)
-                                }
-                            }
+                let decoder = JSONDecoder()
+                let mbResponse = try decoder.decode(MusicBrainzResponse.self, from: data)
+                
+                guard !mbResponse.recordings.isEmpty else {
+                    print("Fehler: Keine Aufnahmen gefunden")
+                    completion(.failure(.noRecordingsFound))
+                    return
+                }
+                
+                var releaseIds: [String] = []
+                for recording in mbResponse.recordings {
+                    if let releases = recording.releases {
+                        for release in releases {
+                            releaseIds.append(release.id)
                         }
                     }
-
-                    if let firstReleaseId = releaseIds.first {
-                        self.getCoverFromCoverArtArchive(releaseId: firstReleaseId, completion: completion)
-                    } else {
-                        print("Keine Release-ID gefunden")
-                        completion(nil)
-                    }
-                    
-                } else {
-                    print("Fehler: Keine Ergebnisse von MusicBrainz gefunden")
-                    completion(nil)
                 }
+                
+                guard let firstReleaseId = releaseIds.first else {
+                    print("Keine Release-ID gefunden")
+                    completion(.failure(.noReleaseIDFound))
+                    return
+                }
+                
+                // Wenn eine Release-ID gefunden wurde, wird das Cover abgerufen
+                self.getCoverFromCoverArtArchive(releaseId: firstReleaseId, completion: completion)
+                
             } catch {
-                print("JSON-Fehler: \(error)")
-                completion(nil)
+                print("Decoding-Fehler: \(error)")
+                completion(.failure(.decodingError(error)))
             }
         }.resume()
     }
     
-    private func getCoverFromCoverArtArchive(releaseId: String, completion: @escaping (URL?) -> Void) {
-        let url = "https://coverartarchive.org/release/\(releaseId)/front"
+    // MARK: Funktion für die Anfrage bei CoverArtArchive
+    private func getCoverFromCoverArtArchive(releaseId: String, completion: @escaping (Result<URL, MusicBrainzError>) -> Void) {
+        let urlString = "https://coverartarchive.org/release/\(releaseId)/front"
         
-        guard let requestUrl = URL(string: url) else {
-            completion(nil)
+        guard let requestUrl = URL(string: urlString) else {
+            completion(.failure(.invalidURL))
             return
         }
         
         URLSession.shared.dataTask(with: requestUrl) { data, response, error in
             if let error = error {
                 print("Fehler beim Abrufen des Covers: \(error.localizedDescription)")
-                completion(nil)
+                completion(.failure(.networkError(error)))
                 return
             }
             
-            guard let response = response as? HTTPURLResponse else {
+            guard let httpResponse = response as? HTTPURLResponse else {
                 print("Ungültige Serverantwort")
-                completion(nil)
+                completion(.failure(.noData))
                 return
             }
             
-            if response.statusCode == 200 {
+            if httpResponse.statusCode == 200 {
                 print("Cover gefunden: \(requestUrl)")
-                completion(requestUrl)
+                completion(.success(requestUrl))
             } else {
-                print("Kein Albumcover verfügbar (Status: \(response.statusCode))")
-                completion(nil)
+                print("Kein Albumcover verfügbar (Status: \(httpResponse.statusCode))")
+                completion(.failure(.noData))
             }
         }.resume()
     }
 }
+
 

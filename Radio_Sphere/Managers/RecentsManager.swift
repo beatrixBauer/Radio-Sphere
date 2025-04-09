@@ -2,11 +2,14 @@
 //  RecentsManager.swift
 //  Radio_Sphere
 //
-//  Created by Beatrix Bauer on 04.03.25.
+//  Created by Beatrix Bauer on 12.04.25.
 //
 
 
 import Foundation
+
+
+// MARK: Verwaltet die zuletzt gehörten Stationen
 
 class RecentsManager {
     static let shared = RecentsManager()

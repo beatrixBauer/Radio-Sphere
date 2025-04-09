@@ -2,7 +2,7 @@
 //  Radio_SphereUITests.swift
 //  Radio_SphereUITests
 //
-//  Created by Beatrix Bauer on 21.02.25.
+//  Created by Beatrix Bauer on 01.04.25.
 //
 
 import XCTest
@@ -33,11 +33,12 @@ final class Radio_SphereUITests: XCTestCase {
 
     @MainActor
     func testLaunchPerformance() throws {
-        if #available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 7.0, *) {
-            // This measures how long it takes to launch your application.
+        if #available(iOS 13.0, *) {
+            // Dieser Test misst, wie lange es dauert, die App zu starten.
             measure(metrics: [XCTApplicationLaunchMetric()]) {
                 XCUIApplication().launch()
             }
         }
     }
+
 }

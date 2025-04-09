@@ -1,33 +1,42 @@
-import XCTest @testable import Radio_Sphere
+//
+//  MockURLProtocol.swift
+//  Radio_Sphere
+//
+//  Created by Beatrix Bauer on 07.05.25.
+//
 
-// MARK: – MockURLProtocol zum Simulieren von API-Antworten class MockURLProtocol: URLProtocol { static var requestHandler: ((URLRequest) throws -> (HTTPURLResponse, Data))?
 
-override class func canInit(with request: URLRequest) -> Bool {
-     return true
-}
+import XCTest
+@testable import Radio_Sphere
 
-override class func canonicalRequest(for request: URLRequest) -> URLRequest {
-     return request
-}
-
-override func startLoading() {
-    guard let handler = MockURLProtocol.requestHandler else {
-        XCTFail("Handler ist nicht gesetzt.")
-        return
+class MockURLProtocol: URLProtocol {
+    static var requestHandler: ((URLRequest) throws -> (HTTPURLResponse, Data))?
+    
+    override class func canInit(with request: URLRequest) -> Bool {
+         return true
     }
     
-    do {
-        let (response, data) = try handler(request)
-        client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
-        client?.urlProtocol(self, didLoad: data)
-        client?.urlProtocolDidFinishLoading(self)
-    } catch {
-        client?.urlProtocol(self, didFailWithError: error)
+    override class func canonicalRequest(for request: URLRequest) -> URLRequest {
+         return request
+    }
+    
+    override func startLoading() {
+        guard let handler = MockURLProtocol.requestHandler else {
+            XCTFail("Handler ist nicht gesetzt.")
+            return
+        }
+        do {
+            let (response, data) = try handler(self.request)
+            self.client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
+            self.client?.urlProtocol(self, didLoad: data)
+            self.client?.urlProtocolDidFinishLoading(self)
+        } catch {
+            self.client?.urlProtocol(self, didFailWithError: error)
+        }
+    }
+    
+    override func stopLoading() {
+        // Keine zusätzliche Logik nötig.
     }
 }
 
-override func stopLoading() {
-    // Keine zusätzliche Logik nötig.
-}
-
-}

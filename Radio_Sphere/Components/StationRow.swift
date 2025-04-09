@@ -1,25 +1,41 @@
+//
+//  StationRow.swift
+//  Radio_Sphere
+//
+//  Created by Beatrix Bauer on 21.04.25.
+//
+
+
 import SwiftUI
+
+
+
+// MARK: Händelt, wie eine ausgewählte Station an den Player übergeben wird
 
 struct StationRow: View {
     let station: RadioStation
     let index: Int
     let filteredStations: [RadioStation]
     let categoryDisplayName: String
+    let isActive: Bool
 
     var body: some View {
-        // Erzeuge die PlayerView außerhalb des Haupt-View-Modifiers, um den Ausdruck zu vereinfachen.
+        
+        // Erzeugt eine PlayerView als Variable
+        // Das vorherige Entpacken verhindert, dass die View zuviel rechnen muss und abstürzt
+        
         let playerView = PlayerView(
             station: station,
             filteredStations: filteredStations,
             categoryTitle: categoryDisplayName,
-            currentIndex: index,
             isSheet: false
         )
         
         return NavigationLink(destination: playerView) {
             StationCardView(station: station)
+                .background(isActive ? Color.blue.opacity(0.2) : Color.clear)
         }
-        .rowBackground(index: index, totalCount: filteredStations.count)
+        .background(Color.clear)
         .padding(.horizontal)
         .listRowInsets(EdgeInsets())
     }

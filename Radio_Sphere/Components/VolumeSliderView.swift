@@ -2,14 +2,13 @@
 //  VolumeSliderView.swift
 //  Radio_Sphere
 //
-//  Created by Beatrix Bauer on 22.02.25.
+//  Created by Beatrix Bauer on 12.04.25.
 //
 
-/// Lautstärke-Slider in der PlayerView
-
 import SwiftUI
-import MediaPlayer
-import AVFoundation
+
+
+// MARK: Anzeige Volume-Slider in der PlayerView
 
 struct VolumeSliderView: View {
     @StateObject private var volumeObserver = AudioManager()
@@ -20,7 +19,7 @@ struct VolumeSliderView: View {
         HStack {
             Image(systemName: "volume.slash").foregroundStyle(.gray)
             Slider(value: $volumeObserver.volume, in: range, step: 0.05)
-                .accentColor(.midblue)
+                .tint(.midblue)
                 .onChange(of: volumeObserver.volume) {
                     volumeObserver.setSystemVolume(to: volumeObserver.volume)
                 }

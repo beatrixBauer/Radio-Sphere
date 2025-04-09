@@ -2,7 +2,7 @@
 //  SplashViewUITests.swift
 //  Radio_Sphere
 //
-//  Created by Beatrix Bauer on 06.04.25.
+//  Created by Beatrix Bauer on 06.05.25.
 //
 
 

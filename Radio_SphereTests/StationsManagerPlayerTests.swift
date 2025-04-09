@@ -1,26 +1,13 @@
+//
+//  StationsManagerPlayerTests.swift
+//  Radio_Sphere
+//
+//  Created by Beatrix Bauer on 06.05.25.
+//
+
+
 import XCTest
 @testable import Radio_Sphere
-
-// Convenience-Initializer für RadioStation (falls noch nicht vorhanden)
-extension RadioStation {
-    init(testID: String, testName: String, testTags: String = "pop") {
-        self.id = testID
-        self.name = testName
-        self.url = "https://example.com/stream"
-        self.country = "DE"
-        self.countrycode = "DE"
-        self.state = nil
-        self.language = "de"
-        self.tags = testTags
-        self.lastcheckok = 1
-        self.imageURL = nil
-        self.codec = nil
-        self.clickcount = 100
-        self.hasExtendedInfo = false
-        self.geo_lat = nil
-        self.geo_long = nil
-    }
-}
 
 final class StationsManagerPlayerTests: XCTestCase {
     
@@ -46,7 +33,7 @@ final class StationsManagerPlayerTests: XCTestCase {
     
     // Testet, ob beim erneuten Setzen des gleichen Senders der Pause-Flag zurückgesetzt wird.
     func testSetSameStation() {
-        let station = RadioStation(testID: "1", testName: "Station A")
+        let station = RadioStation(testID: "1", testName: "Station A", testTags: "pop", testCountry: "Germany", testCountryCode: "DE")
         manager.currentStation = station
         manager.userDidPause = true
         
@@ -59,8 +46,8 @@ final class StationsManagerPlayerTests: XCTestCase {
     
     // Testet, ob beim Wechsel zu einem anderen Sender die Station aktualisiert und die Metadaten zurückgesetzt werden.
     func testSetDifferentStation() {
-        let station1 = RadioStation(testID: "1", testName: "Station A")
-        let station2 = RadioStation(testID: "2", testName: "Station B")
+        let station1 = RadioStation(testID: "1", testName: "Station A", testTags: "pop", testCountry: "Germany", testCountryCode: "DE")
+        let station2 = RadioStation(testID: "2", testName: "Station B", testTags: "pop", testCountry: "Germany", testCountryCode: "DE")
         manager.currentStation = station1
         manager.currentTrack = "Vorheriger Song"
         manager.currentArtist = "Vorheriger Artist"
@@ -76,9 +63,9 @@ final class StationsManagerPlayerTests: XCTestCase {
     
     // Testet die prepareForPlayback()-Funktion: Es sollte die Navigationliste gesetzt und der Index des ausgewählten Senders bestimmt werden.
     func testPrepareForPlayback() {
-        let station1 = RadioStation(testID: "1", testName: "Station A")
-        let station2 = RadioStation(testID: "2", testName: "Station B")
-        let station3 = RadioStation(testID: "3", testName: "Station C")
+        let station1 = RadioStation(testID: "1", testName: "Station A", testTags: "pop", testCountry: "Germany", testCountryCode: "DE")
+        let station2 = RadioStation(testID: "2", testName: "Station B", testTags: "pop", testCountry: "Germany", testCountryCode: "DE")
+        let station3 = RadioStation(testID: "3", testName: "Station C", testTags: "pop", testCountry: "Germany", testCountryCode: "DE")
         
         let navList = [station1, station2, station3]
         manager.currentStation = nil
@@ -91,9 +78,9 @@ final class StationsManagerPlayerTests: XCTestCase {
     
     // Testet die setPrevious() und setNext() Logik.
     func testSetPreviousAndNext() {
-        let station1 = RadioStation(testID: "1", testName: "Station A")
-        let station2 = RadioStation(testID: "2", testName: "Station B")
-        let station3 = RadioStation(testID: "3", testName: "Station C")
+        let station1 = RadioStation(testID: "1", testName: "Station A", testTags: "pop", testCountry: "Germany", testCountryCode: "DE")
+        let station2 = RadioStation(testID: "2", testName: "Station B", testTags: "pop", testCountry: "Germany", testCountryCode: "DE")
+        let station3 = RadioStation(testID: "3", testName: "Station C", testTags: "pop", testCountry: "Germany", testCountryCode: "DE")
         
         manager.currentNavigationList = [station1, station2, station3]
         manager.currentIndex = 1

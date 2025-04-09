@@ -1,3 +1,11 @@
+//
+//  StationsManagerTests.swift
+//  Radio_Sphere
+//
+//  Created by Beatrix Bauer on 06.05.25.
+//
+
+
 import XCTest
 @testable import Radio_Sphere
 
@@ -22,56 +30,15 @@ final class StationsManagerTests: XCTestCase {
     }
 
     func testFilterUniqueStationsByName() {
-        let station1 = RadioStation(
-            id: "1",
-            name: "Station A",
-            url: "http://example.com",
-            country: "DE",
-            countrycode: "DE",
-            state: nil,
-            language: "de",
-            tags: "pop",
-            lastcheckok: 1,
-            imageURL: nil,
-            codec: nil,
-            clickcount: 100,
-            geo_lat: 0.0,
-            geo_long: 0.0
-        )
+        let station1 = RadioStation(testID: "1", testName: "Test Station A", testTags: "pop", testCountry: "Germany", testCountryCode: "DE")
+        
         // Eine Station mit gleichem Namen, aber anderer ID
-        let station2 = RadioStation(
-            id: "2",
-            name: "Station A",
-            url: "http://example.org",
-            country: "DE",
-            countrycode: "DE",
-            state: nil,
-            language: "de",
-            tags: "rock",
-            lastcheckok: 1,
-            imageURL: nil,
-            codec: nil,
-            clickcount: 200,
-            geo_lat: 0.0,
-            geo_long: 0.0
-        )
-        let station3 = RadioStation(
-            id: "3",
-            name: "Station B",
-            url: "http://example.net",
-            country: "DE",
-            countrycode: "DE",
-            state: nil,
-            language: "de",
-            tags: "jazz",
-            lastcheckok: 1,
-            imageURL: nil,
-            codec: nil,
-            clickcount: 150,
-            geo_lat: 0.0,
-            geo_long: 0.0
-        )
+        let station2 = RadioStation(testID: "2", testName: "Test Station A", testTags: "pop", testCountry: "Germany", testCountryCode: "DE")
+        
+        let station3 = RadioStation(testID: "3", testName: "Test Station B", testTags: "pop", testCountry: "Germany", testCountryCode: "DE")
+       
         let stations = [station1, station2, station3]
+        
         let uniqueStations = manager.filterUniqueStationsByName(stations)
         XCTAssertEqual(uniqueStations.count, 2, "Es sollten 2 eindeutige Stationen vorhanden sein.")
     }
@@ -80,37 +47,17 @@ final class StationsManagerTests: XCTestCase {
         // Setze eine Testkategorie und Stationen
         let category = RadioCategory.pop
         let stationPop = RadioStation(
-            id: "1",
-            name: "Pop Station",
-            url: "http://example.com",
-            country: "DE",
-            countrycode: "DE",
-            state: nil,
-            language: "de",
-            tags: "pop",
-            lastcheckok: 1,
-            imageURL: nil,
-            codec: nil,
-            clickcount: 100,
-            geo_lat: 0.0,
-            geo_long: 0.0
-        )
+            testID: "1",
+            testName: "Pop Station",
+            testTags: "pop",
+            testCountry: "Germany",
+            testCountryCode: "DE")
         let stationRock = RadioStation(
-            id: "2",
-            name: "Rock Station",
-            url: "http://example.org",
-            country: "US",
-            countrycode: "US",
-            state: nil,
-            language: "en",
-            tags: "rock",
-            lastcheckok: 1,
-            imageURL: nil,
-            codec: nil,
-            clickcount: 200,
-            geo_lat: 0.0,
-            geo_long: 0.0
-        )
+            testID: "1",
+            testName: "Rock Station",
+            testTags: "rock",
+            testCountry: "Germany",
+            testCountryCode: "DE")
         manager.stationsByCategory[category] = [stationPop, stationRock]
         manager.searchActive = true
         manager.searchText = "pop"

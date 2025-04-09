@@ -1,4 +1,18 @@
+//
+//  FavoritesListView.swift
+//  Radio_Sphere
+//
+//  Created by Beatrix Bauer on 20.04.25.
+//
+
+import SwiftUI
+
+// MARK: Favorites-Kategorie bekommt ein swipeToDelete
+// so können favorisierte Sender direkt aus der Favoriten-Liste gelöscht werden,
+// ohne den Player aufzurufen und das Herzchen zu entfernen
+
 struct FavoritesListView: View {
+    @StateObject private var manager = StationsManager.shared
     var filteredStations: [RadioStation]
     var updateFilteredStations: () -> Void
 
@@ -9,7 +23,8 @@ struct FavoritesListView: View {
                     station: station,
                     index: index,
                     filteredStations: filteredStations,
-                    categoryDisplayName: "Favoriten"
+                    categoryDisplayName: "Favoriten",
+                    isActive: station.id.lowercased() == manager.currentStation?.id.lowercased()
                 )
                 .listRowBackground(Color.clear)
             }
@@ -21,6 +36,5 @@ struct FavoritesListView: View {
                 updateFilteredStations()
             }
         }
-        .listStyle(.plain)
     }
 }

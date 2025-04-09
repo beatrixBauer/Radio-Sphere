@@ -2,34 +2,84 @@
 //  RadioStation.swift
 //  Radio_Sphere
 //
-//  Created by Beatrix Bauer on 21.02.25.
+//  Created by Beatrix Bauer on 01.04.25.
 //
 
 import SwiftUI
 
-struct RadioStation: Identifiable, Codable, Equatable {
+struct RadioStation: Identifiable, Codable, Equatable, Hashable {
     let id: String
     let name: String
     let url: String
     let country: String
+    let countrycode: String
+    let state: String?
     let language: String
     let tags: String?
     let lastcheckok: Int
     let imageURL: String?
     let codec: String?
+    let clickcount: Int
+    var hasExtendedInfo: Bool = false
+    let geo_lat: Double?
+    let geo_long: Double?
 
     enum CodingKeys: String, CodingKey {
         case id = "stationuuid"
         case name
         case url = "url_resolved"
         case country
+        case countrycode
+        case state
         case language
         case tags
         case lastcheckok
         case imageURL = "favicon"
         case codec
+        case clickcount
+        case hasExtendedInfo = "has_extended_info"
+        case geo_lat
+        case geo_long
     }
-
+    
+    // Standardwerte für optionale Felder
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        id = try container.decode(String.self, forKey: .id)
+        name = try container.decode(String.self, forKey: .name)
+        url = try container.decode(String.self, forKey: .url)
+        country = try container.decode(String.self, forKey: .country)
+        countrycode = try container.decode(String.self, forKey: .countrycode)
+        state = try container.decodeIfPresent(String.self, forKey: .state)
+        language = try container.decode(String.self, forKey: .language)
+        tags = try? container.decode(String?.self, forKey: .tags)
+        lastcheckok = try container.decode(Int.self, forKey: .lastcheckok)
+        imageURL = try? container.decode(String?.self, forKey: .imageURL)
+        codec = try? container.decode(String?.self, forKey: .codec)
+        clickcount = try container.decode(Int.self, forKey: .clickcount)
+        hasExtendedInfo = try container.decodeIfPresent(Bool.self, forKey: .hasExtendedInfo) ?? false
+        
+        // Sicheres Dekodieren von geo_lat und geo_long
+        if let latString = try? container.decode(String.self, forKey: .geo_lat),
+           let lat = Double(latString) {
+            geo_lat = lat
+        } else if let latNumber = try? container.decode(Double.self, forKey: .geo_lat) {
+            geo_lat = latNumber
+        } else {
+            geo_lat = nil
+        }
+        
+        if let lonString = try? container.decode(String.self, forKey: .geo_long),
+           let lon = Double(lonString) {
+            geo_long = lon
+        } else if let lonNumber = try? container.decode(Double.self, forKey: .geo_long) {
+            geo_long = lonNumber
+        } else {
+            geo_long = nil
+        }
+    }
+    
     static func == (lhs: RadioStation, rhs: RadioStation) -> Bool {
         return lhs.id == rhs.id &&
                lhs.name == rhs.name &&
@@ -39,39 +89,35 @@ struct RadioStation: Identifiable, Codable, Equatable {
                lhs.imageURL == rhs.imageURL
     }
 
-    // Prüft, ob der Sender ICY-Metadaten oder ID3 nutzt
+    // Prüft, ob der Sender ICY-Metadaten oder ID3 nutzt (wurde zum Testen verwendet)
     func isICYStream() -> Bool {
         if let codec = self.codec {
             return ["MP3", "AAC", "OGG", "OPUS", "FLAC"].contains(codec.uppercased())
         }
         return false
     }
+    
+    // MARK: - Dekodierte Eigenschaften zur Korrektur von Sonderzeichen
 
-    // Standardwerte für optionale Felder
-    init(
-        id: String = UUID().uuidString,
-        name: String = "Unbekannte Station",
-        url: String = "",
-        country: String = "Unbekannt",
-        language: String = "Unbekannt",
-        tags: String? = nil,
-        lastcheckok: Int = 0,
-        imageURL: String? = nil,
-        codec: String? = nil
-    ) {
-        self.id = id
-        self.name = name
-        self.url = url
-        self.country = country
-        self.language = language
-        self.tags = tags
-        self.lastcheckok = lastcheckok
-        self.imageURL = imageURL
-        self.codec = codec
+    var decodedName: String {
+        return name.fixEncoding()
     }
+
+    var decodedTags: String? {
+        return tags?.fixEncoding()
+    }
+    
+    var decodedCountry: String {
+        return country.fixEncoding()
+    }
+    
+    var decodedLanguage: String {
+        return language.fixEncoding()
+    }
+
 }
 
-// MARK: - SwiftUI-kompatible Bilddarstellung
+// MARK: - Lädt das Logo der jeweiligen Radiostation oder des Platzhalters
 struct StationImageView: View {
     let imageURL: String?
 

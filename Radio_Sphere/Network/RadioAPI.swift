@@ -2,123 +2,151 @@
 //  RadioAPI.swift
 //  Radio_Sphere
 //
-//  Created by Beatrix Bauer on 21.02.25.
+//  Created by Beatrix Bauer on 03.04.25.
 //
+
 import Foundation
 
+// MARK: Abfrage von Radio-Browser API
+
 class RadioAPI {
-    private let baseURL = "https://de1.api.radio-browser.info/json/stations"
-
-    /// Holt die Top-Radiosender mit Song-Metadaten für Deutschland
-    func fetchStations(offset: Int, searchQuery: String? = nil, completion: @escaping (Result<Data, Error>) -> Void) {
-        print("Anfrage wird vorbereitet...")
-        
-        let userCountryCode = Locale.current.region?.identifier ?? "DE"
-
-        var components = URLComponents(string: "\(baseURL)/search")
-
-        let queryItems = [
-            URLQueryItem(name: "order", value: "clickcount"),
-            URLQueryItem(name: "countrycode", value: userCountryCode),
-            URLQueryItem(name: "hidebroken", value: "true"),
-            URLQueryItem(name: "lastcheckok", value: "1"), // Nur aktive Sender
-            URLQueryItem(name: "has_extended_info", value: "true") // Sender mit Song-Metadaten
-        ]
-
-        components?.queryItems = queryItems
-
-        guard let urlString = components?.url?.absoluteString else {
-            completion(.failure(DataError.urlNotValid))
-            return
-        }
-
-        print("Anfrage an URL: \(urlString)")
-
-        performRequest(urlString: urlString, completion: completion)
+    private let session: URLSession
+    private var availableBaseURLs: [String] {
+        return getRadioBrowserBaseURLs()
+    }
+    private var baseURL: String {
+        return availableBaseURLs.first! + "/json/stations"
+    }
+    private var limit = "1000"
+    private let userAgent = "Radio Sphere/0.1 (iOS; beatrix.bauer@gmail.com)"
+    
+    // Initializer mit übergebener URLSession – Standard ist URLSession.shared
+    init(session: URLSession = .shared) {
+        self.session = session
     }
     
-    func searchStations(query: String, completion: @escaping ([RadioStation]) -> Void) {
-        let encodedQuery = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-        let urlString = "\(baseURL)/search?name=\(encodedQuery)&limit=200"
-        
-        guard let url = URL(string: urlString) else {
-            print("Fehler: URL konnte nicht erstellt werden.")
-            return
-        }
-
-        print("API-Aufruf gestartet mit URL: \(url.absoluteString)")
-
-        performRequest(urlString: urlString) { result in
-            switch result {
-            case .success(let data):
-                do {
-                    let decodedData = try JSONDecoder().decode([RadioStation].self, from: data)
-                    DispatchQueue.main.async {
-                        completion(decodedData)
-                    }
-                } catch {
-                    print("JSON-Fehler: \(error)")
-                }
-            case .failure(let error):
-                print("Fehler bei der API-Suche: \(error.localizedDescription)")
-            }
-        }
+    /// Ruft alle Stationen remote ab (nur HTTPS-Sender)
+    func fetchAllStations(completion: @escaping ([RadioStation]) -> Void) {
+        let remoteURL = baseURL + "/search?hidebroken=true&lastcheckok=1&is_https=true"
+        performRequest(urlString: remoteURL, completion: completion)
     }
-
-
-    /// Generische Methode für API-Anfragen
-    private func performRequest(urlString: String, completion: @escaping (Result<Data, Error>) -> Void) {
+    
+    /// Abfrage aller Stationen im Mobilfunknetzt mit limit und Pagination
+    func fetchStations(offset: Int, limit: Int, completion: @escaping ([RadioStation]) -> Void) {
+        let remoteURL = baseURL + "/search?hidebroken=true&lastcheckok=1&is_https=true&offset=\(offset)&limit=\(limit)"
+        performRequest(urlString: remoteURL, completion: completion)
+    }
+    
+    private func performRequest(urlString: String, completion: @escaping ([RadioStation]) -> Void) {
+        attemptRequest(urlString: urlString, remainingBaseURLs: availableBaseURLs, completion: completion)
+    }
+    
+    private func attemptRequest(urlString: String, remainingBaseURLs: [String], completion: @escaping ([RadioStation]) -> Void) {
         guard let url = URL(string: urlString) else {
-            completion(.failure(DataError.urlNotValid))
+            print("Fehler: Ungültige URL")
+            completion([])
             return
         }
-
         var request = URLRequest(url: url)
-        request.setValue("RadioSphere/0.1 (in development)", forHTTPHeaderField: "User-Agent")
-
-        URLSession.shared.dataTask(with: request) { data, response, error in
+        request.setValue(userAgent, forHTTPHeaderField: "User-Agent")
+        
+        session.dataTask(with: request) { data, response, error in
+            // Bei einem Fehler wird ein alternativer Server versucht
             if let error = error {
-                completion(.failure(error))
+                print("Fehler bei der API-Anfrage: \(error.localizedDescription)")
+                if let currentHost = URL(string: urlString)?.host,
+                   let alternative = remainingBaseURLs.first(where: { URL(string: $0)?.host != currentHost }) {
+                    if let newURL = URL(string: urlString) {
+                        let newHost = URL(string: alternative)?.host ?? ""
+                        var components = URLComponents(url: newURL, resolvingAgainstBaseURL: false)
+                        components?.host = newHost
+                        if let newURLString = components?.url?.absoluteString {
+                            print("Versuche alternativen Server: \(newURLString)")
+                            let updatedRemaining = remainingBaseURLs.filter { $0 != alternative }
+                            self.attemptRequest(urlString: newURLString, remainingBaseURLs: updatedRemaining, completion: completion)
+                            return
+                        }
+                    }
+                }
+                completion([])
                 return
             }
-
-            guard let httpResponse = response as? HTTPURLResponse, 200...299 ~= httpResponse.statusCode else {
-                completion(.failure(DataError.httpResponseNotValid))
-                return
+            
+            if let httpResponse = response as? HTTPURLResponse {
+                print("Server-Antwort: Status Code \(httpResponse.statusCode)")
             }
-
+            
             guard let data = data else {
-                completion(.failure(DataError.dataNotFound))
+                print("Fehler: Keine Daten erhalten")
+                completion([])
                 return
             }
-
-            // Filtere alle Sender ohne HTTPS-Streams
-            if let filteredData = self.filterHTTPSStations(from: data) {
-                completion(.success(filteredData))
-            } else {
-                completion(.failure(DataError.dataNotFound))
+            
+            do {
+                let decodedData = try JSONDecoder().decode([RadioStation].self, from: data)
+                DispatchQueue.main.async {
+                    completion(decodedData)
+                }
+            } catch {
+                print("JSON-Fehler: \(error)")
+                completion([])
             }
         }.resume()
     }
-
-    /// Filtert alle Sender, die keine `https://`-Streams haben
-    private func filterHTTPSStations(from data: Data) -> Data? {
-        do {
-            if let jsonArray = try JSONSerialization.jsonObject(with: data, options: []) as? [[String: Any]] {
-                let filteredArray = jsonArray.filter { station in
-                    if let url = station["url_resolved"] as? String {
-                        return url.lowercased().starts(with: "https")
-                    }
-                    return false
-                }
-                return try JSONSerialization.data(withJSONObject: filteredArray, options: [])
-            }
-        } catch {
-            print("Fehler beim Filtern der Streams: \(error)")
+    
+    // Ermittlung der verfügbaren Server von Radio-Browser (DE soll bevorzugt werden)
+    func getRadioBrowserBaseURLs() -> [String] {
+        let fallbackURLs = [
+            "https://de2.api.radio-browser.info",
+            "https://fi1.api.radio-browser.info/",
+            "https://at1.api.radio-browser.info"
+        ]
+        let hostname: CFString = "all.api.radio-browser.info" as CFString
+        var streamError = CFStreamError()
+        guard let hostRef = CFHostCreateWithName(nil, hostname).takeRetainedValue() as CFHost? else {
+            return fallbackURLs
         }
-        return nil
+        let resolutionSuccess = CFHostStartInfoResolution(hostRef, .addresses, &streamError)
+        if !resolutionSuccess {
+            print("Fehler beim Auflösen von \(hostname): \(streamError)")
+            return fallbackURLs
+        }
+        var resolved: DarwinBoolean = false
+        guard let addressesCF = CFHostGetAddressing(hostRef, &resolved)?.takeUnretainedValue() as? [Data] else {
+            return fallbackURLs
+        }
+        var hostnames = Set<String>()
+        for addressData in addressesCF {
+            addressData.withUnsafeBytes { (pointer: UnsafeRawBufferPointer) in
+                guard let addrPtr = pointer.baseAddress?.assumingMemoryBound(to: sockaddr.self) else { return }
+                var hostBuffer = [CChar](repeating: 0, count: Int(NI_MAXHOST))
+                if getnameinfo(addrPtr, socklen_t(addressData.count), &hostBuffer, socklen_t(hostBuffer.count), nil, 0, NI_NAMEREQD) == 0 {
+                    let hostName = String(cString: hostBuffer)
+                    hostnames.insert(hostName)
+                }
+            }
+        }
+        let sorted = hostnames.sorted { lhs, rhs in
+            let lhsIsDE = lhs.hasPrefix("de")
+            let rhsIsDE = rhs.hasPrefix("de")
+            if lhsIsDE && !rhsIsDE {
+                return true
+            } else if !lhsIsDE && rhsIsDE {
+                return false
+            } else {
+                return lhs < rhs
+            }
+        }
+        let urls = sorted.map { "https://" + $0 }
+        return urls.isEmpty ? fallbackURLs : urls
     }
 }
+
+
+
+
+
+
 
 
 

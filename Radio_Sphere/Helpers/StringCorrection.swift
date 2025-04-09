@@ -2,8 +2,14 @@
 //  StringCorrection.swift
 //  Radio_Sphere
 //
-//  Created by Beatrix Bauer on 22.02.25.
+//  Created by Beatrix Bauer on 02.04.25.
 //
+
+
+
+// MARK: dient der richtigen Darstellung der Metadaten
+// Handling von Sonderzeichen für die richtige Darstellung der Metadaten, wie Songtitel oder Künstler
+
 extension String {
     /// Versucht verschiedene Zeichenkodierungen, um fehlerhafte Umlaute zu korrigieren
     func fixEncoding() -> String {

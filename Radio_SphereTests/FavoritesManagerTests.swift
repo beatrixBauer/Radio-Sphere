@@ -1,3 +1,11 @@
+//
+//  FavoritesManagerTests.swift
+//  Radio_Sphere
+//
+//  Created by Beatrix Bauer on 06.05.25.
+//
+
+
 import XCTest
 @testable import Radio_Sphere
 
@@ -11,22 +19,8 @@ final class FavoritesManagerTests: XCTestCase {
 
     func testAddAndRemoveFavorite() {
         let manager = FavoritesManager.shared
-        let testStation = RadioStation(
-            id: "station1",
-            name: "Test Station",
-            url: "https://example.com",
-            country: "DE",
-            countrycode: "DE",
-            state: nil,
-            language: "de",
-            tags: "pop",
-            lastcheckok: 1,
-            imageURL: nil,
-            codec: nil,
-            clickcount: 100,
-            geo_lat: nil,
-            geo_long: nil
-        )
+        let testStation = RadioStation(testID: "station1", testName: "Test Station", testTags: "Pop", testCountry: "Germany", testCountryCode: "DE")
+
 
         // Favorit hinzufügen
         manager.addFavorite(station: testStation)
@@ -43,25 +37,13 @@ final class FavoritesManagerTests: XCTestCase {
 
     func testIsFavorite() {
         let manager = FavoritesManager.shared
-        let testStation = RadioStation(
-            id: "station1",
-            name: "Test Station",
-            url: "https://example.com",
-            country: "DE",
-            countrycode: "DE",
-            state: nil,
-            language: "de",
-            tags: "pop",
-            lastcheckok: 1,
-            imageURL: nil,
-            codec: nil,
-            clickcount: 100,
-            geo_lat: nil,
-            geo_long: nil
-        )
-
+        let testStation = RadioStation(testID: "station1", testName: "Test Station", testTags: "Pop", testCountry: "Germany", testCountryCode: "DE")
+        
         XCTAssertFalse(manager.isFavorite(station: testStation), "Die Station sollte noch nicht favorisiert sein.")
         manager.addFavorite(station: testStation)
         XCTAssertTrue(manager.isFavorite(station: testStation), "Die Station sollte jetzt favorisiert sein.")
     }
 }
+
+
+

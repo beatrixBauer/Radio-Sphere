@@ -2,17 +2,22 @@
 //  CategoryTile.swift
 //  Radio_Sphere
 //
-//  Created by Beatrix Bauer on 28.02.25.
+//  Created by Beatrix Bauer on 12.04.25.
 //
+
 import SwiftUI
 
-struct CategoryTile: View {
+
+// MARK: Ansicht Kategorien-Kachel
+
+struct CategoryTile<BackgroundStyle: ShapeStyle>: View {
     let title: String
-    
+    let background: BackgroundStyle
+
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 12)
-                .fill(Color.blue.opacity(0.2))
+                .fill(background)
                 .frame(height: 120)
             
             Text(title)
@@ -22,3 +27,5 @@ struct CategoryTile: View {
         }
     }
 }
+
+

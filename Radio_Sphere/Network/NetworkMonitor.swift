@@ -1,4 +1,15 @@
+//
+//  NetworkMonitor.swift
+//  Radio_Sphere
+//
+//  Created by Beatrix Bauer on 27.04.25.
+//
+
+
 import Network
+import Combine
+
+// Überprüfung der Internetverbindung beim Start der App -> wird von SplashView aufgerufen
 
 class NetworkMonitor: ObservableObject {
     static let shared = NetworkMonitor()
@@ -7,11 +18,23 @@ class NetworkMonitor: ObservableObject {
     private let queue = DispatchQueue.global(qos: .background)
     
     @Published var isConnected: Bool = false
+    @Published var connectionType: NWInterface.InterfaceType?
     
-    private init() {
+    private init() {}
+    
+    // MARK: Startet die Netzwerküberwachung
+    func startMonitoring() {
         monitor.pathUpdateHandler = { [weak self] path in
             DispatchQueue.main.async {
                 self?.isConnected = path.status == .satisfied
+                
+                // Bestimme den primären Verbindungstyp
+                if let interface = path.availableInterfaces.first(where: { path.usesInterfaceType($0.type) }) {
+                    self?.connectionType = interface.type
+                } else {
+                    self?.connectionType = nil
+                }
+                
                 if path.status == .satisfied {
                     print("Netzwerkverbindung besteht.")
                 } else {
@@ -20,5 +43,13 @@ class NetworkMonitor: ObservableObject {
             }
         }
         monitor.start(queue: queue)
+        print("Netzwerkmonitor gestartet.")
+    }
+    
+    /// Stoppt die Netzwerküberwachung
+    func stopMonitoring() {
+        monitor.cancel()
+        print("Netzwerkmonitor gestoppt.")
     }
 }
+

@@ -1,26 +1,13 @@
+//
+//  StationsManagerFilterTests.swift
+//  Radio_Sphere
+//
+//  Created by Beatrix Bauer on 06.05.25.
+//
+
+
 import XCTest
 @testable import Radio_Sphere
-
-// Falls noch nicht vorhanden, definieren wir einen Convenience-Initializer, um Teststationen schnell zu erzeugen.
-extension RadioStation {
-    init(testID: String, testName: String, testTags: String = "pop") {
-        self.id = testID
-        self.name = testName
-        self.url = "https://example.com/stream"
-        self.country = "DE"
-        self.countrycode = "DE"
-        self.state = nil
-        self.language = "de"
-        self.tags = testTags
-        self.lastcheckok = 1
-        self.imageURL = nil
-        self.codec = nil
-        self.clickcount = 100
-        self.hasExtendedInfo = false
-        self.geo_lat = nil
-        self.geo_long = nil
-    }
-}
 
 final class StationsManagerFilterTests: XCTestCase {
 
@@ -46,9 +33,9 @@ final class StationsManagerFilterTests: XCTestCase {
     
     // Testet, ob beim Filtern nach Kategorie-Tags nur die passenden Stationen zurückgegeben werden.
     func testFilterStationsForCategory() {
-        let station1 = RadioStation(testID: "1", testName: "Pop Station", testTags: "pop, music")
-        let station2 = RadioStation(testID: "2", testName: "Rock Station", testTags: "rock, alternative")
-        let station3 = RadioStation(testID: "3", testName: "Jazz Station", testTags: "jazz")
+        let station1 = RadioStation(testID: "1", testName: "Pop Station", testTags: "pop, music", testCountry: "Germany", testCountryCode: "DE")
+        let station2 = RadioStation(testID: "2", testName: "Rock Station", testTags: "rock, alternative", testCountry: "Germany", testCountryCode: "DE")
+        let station3 = RadioStation(testID: "3", testName: "Jazz Station", testTags: "jazz", testCountry: "Germany", testCountryCode: "DE")
         
         // Alle Stationen in manager.allStations bereitstellen
         manager.allStations = [station1, station2, station3]
@@ -60,9 +47,9 @@ final class StationsManagerFilterTests: XCTestCase {
     
     // Testet, ob bei aktivierter Suche und gesetztem Suchtext nur Stationen zurückgegeben werden, die den Suchtext beinhalten.
     func testApplyFiltersBySearch() {
-        let station1 = RadioStation(testID: "1", testName: "Best Pop Station", testTags: "pop")
-        let station2 = RadioStation(testID: "2", testName: "Rocking Beats", testTags: "rock")
-        let station3 = RadioStation(testID: "3", testName: "Smooth Jazz", testTags: "jazz")
+        let station1 = RadioStation(testID: "1", testName: "Best Pop Station", testTags: "pop", testCountry: "Germany", testCountryCode: "DE")
+        let station2 = RadioStation(testID: "2", testName: "Rocking Beats", testTags: "rock", testCountry: "Germany", testCountryCode: "DE")
+        let station3 = RadioStation(testID: "3", testName: "Smooth Jazz", testTags: "jazz", testCountry: "Germany", testCountryCode: "DE")
         
         // Simuliere, dass in der Kategorie .pop alle drei Stationen vorhanden sind.
         manager.stationsByCategory[.pop] = [station1, station2, station3]
@@ -76,25 +63,34 @@ final class StationsManagerFilterTests: XCTestCase {
     
     // Testet, ob die Filterung nach ausgewähltem Land funktioniert.
     func testApplyFiltersBySelectedCountry() {
-        let station1 = RadioStation(testID: "1", testName: "Station in DE", testTags: "pop")
-        let station2 = RadioStation(testID: "2", testName: "Station in US", testTags: "pop")
-        // Da der Convenience-Initializer standardmäßig "DE" setzt, modifizieren wir station2 manuell.
-        var modStation2 = station2
-        modStation2.country = "US"
-        modStation2.countrycode = "US"
+        // Erstelle station1 und station2 mit den entsprechenden Länderwerten direkt im Initializer.
+        let station1 = RadioStation(
+            testID: "1",
+            testName: "Station in DE",
+            testTags: "pop",
+            testCountry: "DE",
+            testCountryCode: "DE"
+        )
+        let station2 = RadioStation(
+            testID: "2",
+            testName: "Station in US",
+            testTags: "pop",
+            testCountry: "US",
+            testCountryCode: "US"
+        )
         
-        manager.stationsByCategory[.pop] = [station1, modStation2]
+        manager.stationsByCategory[.pop] = [station1, station2]
         manager.selectedCountry = "US"
         
         let filtered = manager.applyFilters(to: .pop)
         XCTAssertEqual(filtered.count, 1, "Es sollte nur 1 Station aus den USA übrig bleiben.")
-        XCTAssertEqual(filtered.first?.id, modStation2.id, "Die gefilterte Station sollte die US-Station sein.")
+        XCTAssertEqual(filtered.first?.id, station2.id, "Die gefilterte Station sollte die US-Station sein.")
     }
     
     // Testet, ob die alphabetische Sortierung der gefilterten Stationen korrekt erfolgt.
     func testApplyFiltersAlphabeticalSorting() {
-        let station1 = RadioStation(testID: "1", testName: "B Station", testTags: "pop")
-        let station2 = RadioStation(testID: "2", testName: "A Station", testTags: "pop")
+        let station1 = RadioStation(testID: "1", testName: "B Station", testTags: "pop", testCountry: "Germany", testCountryCode: "DE")
+        let station2 = RadioStation(testID: "2", testName: "A Station", testTags: "pop", testCountry: "Germany", testCountryCode: "DE")
         manager.stationsByCategory[.pop] = [station1, station2]
         manager.alphabetical = true
         
