@@ -35,7 +35,7 @@ struct SleepTimerView: View {
                 .foregroundColor(manager.isSleepTimerActive ? .goldorange : .gray)
                 .shadow(radius: 4)
         }
-        .onChange(of: manager.isPlaying) {
+        .onChange(of: manager.isPlaying) { newValue in
             if !manager.isPlaying {
                 stopTimer()
             }

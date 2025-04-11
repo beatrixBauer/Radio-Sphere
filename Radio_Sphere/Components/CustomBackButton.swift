@@ -11,7 +11,7 @@ import SwiftUI
 // verwendet selectedTab, damit immer der passende Zurück-Text angezeigt wird
 
 struct CustomBackButton: View {
-    let title: String
+    let title: LocalizedStringKey
     let foregroundColor: Color
     @Environment(\.dismiss) private var dismiss
     @Environment(\.selectedTab) private var selectedTab

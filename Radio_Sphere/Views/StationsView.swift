@@ -19,6 +19,7 @@ struct StationsView: View {
     var body: some View {
         NavigationStack {
             let filteredStations = manager.filteredStationsByCategory[category] ?? []
+            let toolbarTitle = LocalizedStringKey("Hörwelten")
             
             Group {
                 
@@ -48,7 +49,7 @@ struct StationsView: View {
             .searchable(text: $manager.searchText, prompt: "Sender suchen")
             .autocorrectionDisabled()
             .animation(.default, value: manager.searchText)
-            .onChange(of: manager.searchText) { oldText, newText in
+            .onChange(of: manager.searchText) { newText in
                 if !newText.isEmpty || manager.searchActive {
                     manager.handleSearchTextChange(newText)
                     updateFilteredStations()
@@ -56,13 +57,13 @@ struct StationsView: View {
                     print("Leerer Suchtext ignoriert, um Filter zu behalten.")
                 }
             }
-            .onChange(of: manager.selectedCountry) {
+            .onChange(of: manager.selectedCountry) { _ in
                 updateFilteredStations()
             }
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     CustomBackButton(
-                        title: "Hörwelten",
+                        title: toolbarTitle,
                         foregroundColor: .white,
                         category: category // die aktuelle Kategorie übergeben
                     )

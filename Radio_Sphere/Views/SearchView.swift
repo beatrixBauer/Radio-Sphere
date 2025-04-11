@@ -86,7 +86,7 @@ struct SearchView: View {
                     searchCompleted = true
                 }
             }
-            .onChange(of: manager.globalSearchText) { oldValue, newValue in
+            .onChange(of: manager.globalSearchText) { newValue in
                 // Leere Suchergebnisse, wenn das Suchfeld geleert wird (z.B. beim Cancel)
                 if newValue.isEmpty {
                     manager.searchedStations = []

@@ -87,7 +87,7 @@ struct MainView: View {
         } message: {
             Text("Für die Nutzung der RadioApp ist eine Internetverbindung notwendig. Bitte verbinde dich mit dem Internet.")
         }
-        .onChange(of: selectedTab) { oldValue, newValue in
+        .onChange(of: selectedTab) { newValue in
             print("Aktiver Tab gewechselt: \(newValue)")
         }
         .tint(.white)

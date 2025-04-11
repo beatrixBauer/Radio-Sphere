@@ -36,33 +36,31 @@ enum RadioCategory: String, CaseIterable {
     case party = "Party"
     case artistRadio = "Künstler-Radio"
     
-    
-    //Anzeigenamen für den Navigationtitle in der StationView
-    
+    // Anzeigenamen für die Kategorien (NavigationTitle StationsView)
     var displayName: String {
         switch self {
-        case .pop: return "Pop-Sender"
-        case .rock: return "Rock-Sender"
-        case .jazz: return "Jazz-Sender"
-        case .classical: return "Klassik-Sender"
-        case .dance: return "Dance-Sender"
-        case .electronic: return "Elektronische Musik"
-        case .local: return "Lokale Sender"
-        case .recent: return "Zuletzt gehört"
-        case .favorites: return "Deine Favoriten"
-        case .news: return "Nachrichten-Sender"
-        case .country: return "Country-Sender"
-        case .hiphop: return "Hip-Hop-Sender"
-        case .alternative: return "Alternative-Sender"
-        case .oldies: return "Oldies"
-        case .latin: return "Latin"
-        case .metal: return "Metal"
-        case .punk: return "Punk"
-        case .tradtionalMusic: return "Volksmusik"
-        case .chillout: return "Chillout"
-        case .meditation: return "Meditation"
-        case .party: return "Party"
-        case .artistRadio: return "Künstler-Radio"
+        case .pop: return NSLocalizedString("category_pop", comment: "Pop-Sender")
+        case .rock: return NSLocalizedString("category_rock", comment: "Rock-Sender")
+        case .jazz: return NSLocalizedString("category_jazz", comment: "Jazz-Sender")
+        case .classical: return NSLocalizedString("category_classical", comment: "Klassik-Sender")
+        case .dance: return NSLocalizedString("category_dance", comment: "Dance-Sender")
+        case .electronic: return NSLocalizedString("category_electronic", comment: "Elektronische Musik")
+        case .local: return NSLocalizedString("category_local", comment: "Lokale Sender")
+        case .recent: return NSLocalizedString("category_recent", comment: "Zuletzt gehört")
+        case .favorites: return NSLocalizedString("category_favorites", comment: "Deine Favoriten")
+        case .news: return NSLocalizedString("category_news", comment: "Nachrichten-Sender")
+        case .country: return NSLocalizedString("category_country", comment: "Country-Sender")
+        case .hiphop: return NSLocalizedString("category_hiphop", comment: "Hip-Hop-Sender")
+        case .alternative: return NSLocalizedString("category_alternative", comment: "Alternative-Sender")
+        case .oldies: return NSLocalizedString("category_oldies", comment: "Oldies")
+        case .latin: return NSLocalizedString("category_latin", comment: "Latin")
+        case .metal: return NSLocalizedString("category_metal", comment: "Metal")
+        case .punk: return NSLocalizedString("category_punk", comment: "Punk")
+        case .tradtionalMusic: return NSLocalizedString("category_traditional", comment: "Volksmusik")
+        case .chillout: return NSLocalizedString("category_chillout", comment: "Chillout")
+        case .meditation: return NSLocalizedString("category_meditation", comment: "Meditation")
+        case .party: return NSLocalizedString("category_party", comment: "Party")
+        case .artistRadio: return NSLocalizedString("category_artist_radio", comment: "Künstler-Radio")
         }
     }
 

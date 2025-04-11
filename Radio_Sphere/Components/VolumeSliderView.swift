@@ -20,7 +20,7 @@ struct VolumeSliderView: View {
             Image(systemName: "volume.slash").foregroundStyle(.gray)
             Slider(value: $volumeObserver.volume, in: range, step: 0.05)
                 .tint(.midblue)
-                .onChange(of: volumeObserver.volume) {
+                .onChange(of: volumeObserver.volume) { newValue in
                     volumeObserver.setSystemVolume(to: volumeObserver.volume)
                 }
             Image(systemName: "volume").foregroundStyle(.gray)

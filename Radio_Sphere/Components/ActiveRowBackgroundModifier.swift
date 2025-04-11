@@ -18,9 +18,13 @@ struct ActiveRowBackgroundModifier: ViewModifier {
                     if isActive {
                         // Hervorhebung, wenn die Zeile aktiv ist
                         LinearGradient(
-                            gradient: Gradient(colors: [Color.itunespink.opacity(0.5), Color.blue.opacity(0.05)]),
-                            startPoint: .leading,
-                            endPoint: .trailing
+                            gradient: Gradient(colors: [
+                                Color.darkblue.opacity(0.2),
+                                Color.midblue.opacity(0.4),
+                                Color.darkblue.opacity(0.2)
+                            ]),
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
                         )
                     } else {
                         // Standardhintergrund (transparent)

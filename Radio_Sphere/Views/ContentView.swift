@@ -26,18 +26,19 @@ struct ContentView: View {
                 LazyVGrid(columns: columns, spacing: 16) {
                     ForEach(categories, id: \.self) { category in
                         NavigationLink(destination: StationsView(category: category)) {
-                            CategoryTile(title: category.rawValue,
+                            CategoryTile(title: category.displayName,
                                          background: category.backgroundStyle)
                         }
                     }
                 }
                 .padding()
+                .padding(.bottom, 50)
             }
             .onDisappear {
                 manager.allowFilterReset()
                 manager.resetFilters()
             }
-            .navigationTitle("Hörwelten")
+            .navigationTitle(LocalizedStringKey("Hörwelten"))
             .applyBackgroundGradient()
         }
         .preferredColorScheme(.dark)
