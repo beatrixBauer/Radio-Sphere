@@ -10,9 +10,9 @@ import SwiftUI
 // MARK: Sleeptimer-Button in der PlayerView
 
 struct SleepTimerView: View {
-    @State private var selectedTime: Int? = nil
-    @State private var remainingTime: Int? = nil
-    @State private var timer: Timer? = nil
+    @State private var selectedTime: Int?
+    @State private var remainingTime: Int?
+    @State private var timer: Timer?
     @StateObject private var manager = StationsManager.shared
 
     let sleepDurations = [5, 10, 15, 30, 60] // Auswahl in Minuten
@@ -35,7 +35,7 @@ struct SleepTimerView: View {
                 .foregroundColor(manager.isSleepTimerActive ? .goldorange : .gray)
                 .shadow(radius: 4)
         }
-        .onChange(of: manager.isPlaying) { newValue in
+        .onChange(of: manager.isPlaying) { _ in
             if !manager.isPlaying {
                 stopTimer()
             }

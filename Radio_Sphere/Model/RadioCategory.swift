@@ -10,8 +10,7 @@ import SwiftUICore
 // MARK: Radiokategorien
 
 enum RadioCategory: String, CaseIterable {
-    
-    
+
     case local = "Lokale Sender"
     case recent = "Zuletzt gehört"
     case favorites = "Deine Favoriten"
@@ -35,7 +34,7 @@ enum RadioCategory: String, CaseIterable {
     case punk = "Punk"
     case party = "Party"
     case artistRadio = "Künstler-Radio"
-    
+
     // Anzeigenamen für die Kategorien (NavigationTitle StationsView)
     var displayName: String {
         switch self {
@@ -94,7 +93,7 @@ enum RadioCategory: String, CaseIterable {
         case .punk:
             return ["punk"]
         case .chillout:
-            return ["chillout", "lo-fi", "chill", "ambient", "relaxation", ]
+            return ["chillout", "lo-fi", "chill", "ambient", "relaxation" ]
         case .tradtionalMusic:
             return ["folk", "volksmusik", "polka", "marsch", "blasmusik"]
         case .news:
@@ -109,7 +108,7 @@ enum RadioCategory: String, CaseIterable {
             return []
         }
     }
-    
+
     var isLocalData: Bool {
         switch self {
         case .recent, .favorites:
@@ -160,5 +159,3 @@ extension RadioCategory {
         }
     }
 }
-
-

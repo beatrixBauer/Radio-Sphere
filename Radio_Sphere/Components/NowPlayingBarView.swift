@@ -16,13 +16,13 @@ private let barWidthScaleFactor = 1 / (CGFloat(numBars) + CGFloat(numBars - 1) *
 
 struct NowPlayingBarView: View {
     @State private var animating = false
-    
+
     var body: some View {
         GeometryReader { geo in
             let barWidth = geo.widthScaled(barWidthScaleFactor)
             let spacerWidth = barWidth * spacerWidthRatio
             HStack(spacing: spacerWidth) {
-                ForEach(0..<numBars, id: \.self) { index in
+                ForEach(0..<numBars, id: \.self) { _ in
                     Bar(minHeightFraction: 0.1, maxHeightFraction: 1, completion: animating ? 1 : 0)
                         .fill(Color.white)
                         .frame(width: barWidth)
@@ -54,18 +54,18 @@ private struct Bar: Shape {
     private let minHeightFraction: CGFloat
     private let maxHeightFraction: CGFloat
     var completion: CGFloat
-    
+
     var animatableData: CGFloat {
         get { completion }
         set { completion = newValue }
     }
-    
+
     init(minHeightFraction: CGFloat, maxHeightFraction: CGFloat, completion: CGFloat) {
         self.minHeightFraction = minHeightFraction
         self.maxHeightFraction = maxHeightFraction
         self.completion = completion
     }
-    
+
     func path(in rect: CGRect) -> Path {
         var path = Path()
         let heightFraction = minHeightFraction + (maxHeightFraction - minHeightFraction) * completion

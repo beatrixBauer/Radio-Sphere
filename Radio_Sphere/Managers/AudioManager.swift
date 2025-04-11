@@ -16,19 +16,19 @@ import Combine
 class AudioManager: NSObject, ObservableObject {
     // Singleton-Instanz für globalen Zugriff
     static let shared = AudioManager()
-    
+
     // Beobachtung der Lautstärke
     @Published var volume: Float = AVAudioSession.sharedInstance().outputVolume
-    
+
     // Referenz auf die Audiosession
     private var audioSession = AVAudioSession.sharedInstance()
-    
+
     // zur Änderung der Systemlautstärke
     private var volumeView = MPVolumeView()
-    
-    //Cancellable für die Beobachtung der Lautstärke-Änderungen via Combine.
+
+    // Cancellable für die Beobachtung der Lautstärke-Änderungen via Combine.
     private var cancellable: AnyCancellable?
-    
+
     // Variable zeigt an dass die Lautstärkeänderungen vom Slider kommen
     private var isUpdatingFromSlider = false
 
@@ -48,12 +48,12 @@ class AudioManager: NSObject, ObservableObject {
     // um die Systemlautstärke über ihren internen Slider zu steuern.
     // Um jedoch die eigene, designangepasste Lautstärkeregelung (VolumeSliderView) anzuzeigen,
     // wird die MPVolumeView "versteckt" – also außerhalb des sichtbaren Bereichs positioniert.
-    
+
     private func setupHiddenVolumeView() {
         DispatchQueue.main.async {
             if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
                let keyWindow = windowScene.windows.first {
-                
+
                 self.volumeView = MPVolumeView(frame: CGRect(x: -2000, y: -2000, width: 1, height: 1))
                 self.volumeView.isHidden = false
                 keyWindow.addSubview(self.volumeView)
@@ -97,7 +97,7 @@ class AudioManager: NSObject, ObservableObject {
     // Systemlautstärke ändern
     func setSystemVolume(to value: Float) {
         isUpdatingFromSlider = true
-        
+
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             guard let slider = self.volumeView.subviews.first(where: { $0 is UISlider }) as? UISlider else {
                 print("Fehler: MPVolumeView Slider konnte nicht gefunden werden")
@@ -108,7 +108,3 @@ class AudioManager: NSObject, ObservableObject {
         }
     }
 }
-
-
-
-

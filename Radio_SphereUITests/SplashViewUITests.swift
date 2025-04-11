@@ -5,13 +5,12 @@
 //  Created by Beatrix Bauer on 06.05.25.
 //
 
-
 import XCTest
 
 class SplashViewUITests: XCTestCase {
-    
+
     var app: XCUIApplication!
-    
+
     override func setUp() {
         super.setUp()
         continueAfterFailure = false
@@ -20,12 +19,12 @@ class SplashViewUITests: XCTestCase {
         app.launchArguments.append("UITest_SplashView")
         app.launch()
     }
-    
+
     override func tearDown() {
         app.terminate()
         super.tearDown()
     }
-    
+
     func testSplashViewDisplaysAppName() {
         // Wir warten darauf, dass der Text "Radio Sphere" (der Name der App) sichtbar wird.
         let appNameLabel = app.staticTexts["Radio Sphere"]

@@ -19,7 +19,7 @@ struct CustomBackButton: View {
 
     var body: some View {
         Button(action: {
-            if let category = category, (category == .favorites || category == .recent) {
+            if let category = category, category == .favorites || category == .recent {
                 selectedTab?.wrappedValue = 0
             } else {
                 dismiss()
@@ -35,6 +35,3 @@ struct CustomBackButton: View {
         }
     }
 }
-
-
-

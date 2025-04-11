@@ -74,7 +74,3 @@ struct MiniPlayerView: View {
         }
     }
 }
-
-
-
-

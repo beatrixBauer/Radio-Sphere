@@ -5,7 +5,6 @@
 //  Created by Beatrix Bauer on 06.05.25.
 //
 
-
 import XCTest
 @testable import Radio_Sphere
 
@@ -31,14 +30,14 @@ final class StationsManagerTests: XCTestCase {
 
     func testFilterUniqueStationsByName() {
         let station1 = RadioStation(testID: "1", testName: "Test Station A", testTags: "pop", testCountry: "Germany", testCountryCode: "DE")
-        
+
         // Eine Station mit gleichem Namen, aber anderer ID
         let station2 = RadioStation(testID: "2", testName: "Test Station A", testTags: "pop", testCountry: "Germany", testCountryCode: "DE")
-        
+
         let station3 = RadioStation(testID: "3", testName: "Test Station B", testTags: "pop", testCountry: "Germany", testCountryCode: "DE")
-       
+
         let stations = [station1, station2, station3]
-        
+
         let uniqueStations = manager.filterUniqueStationsByName(stations)
         XCTAssertEqual(uniqueStations.count, 2, "Es sollten 2 eindeutige Stationen vorhanden sein.")
     }
@@ -61,7 +60,7 @@ final class StationsManagerTests: XCTestCase {
         manager.stationsByCategory[category] = [stationPop, stationRock]
         manager.searchActive = true
         manager.searchText = "pop"
-        
+
         let filtered = manager.applyFilters(to: category)
         XCTAssertEqual(filtered.count, 1, "Es sollten nur 1 Station nach Filterung übrig bleiben.")
         XCTAssertEqual(filtered.first?.id, stationPop.id, "Die gefilterte Station sollte die Pop Station sein.")

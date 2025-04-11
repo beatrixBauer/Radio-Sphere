@@ -5,9 +5,7 @@
 //  Created by Beatrix Bauer on 17.04.25.
 //
 
-
 import SwiftUI
-
 
 // MARK: Definiert wiederverwendbaren Button, der beim Tippen kurz die Farbe wechselt
 // Verwendung in der PlayerView für next und previous Station
@@ -44,4 +42,3 @@ struct ActionButton: View {
         .buttonStyle(.plain)
     }
 }
-

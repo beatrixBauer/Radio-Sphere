@@ -5,7 +5,6 @@
 //  Created by Beatrix Bauer on 06.05.25.
 //
 
-
 import XCTest
 @testable import Radio_Sphere
 
@@ -52,7 +51,7 @@ final class iTunesAPITests: XCTestCase {
             // Wir erwarten, dass beide URLs nicht nil sind
             XCTAssertNotNil(artworkUrl, "Artwork URL should not be nil")
             XCTAssertNotNil(trackUrl, "Track URL should not be nil")
-            
+
             // Die artworkUrl soll von 100x100 zu 1200x1200 transformiert worden sein
             if let artworkUrl = artworkUrl {
                 XCTAssertTrue(artworkUrl.absoluteString.contains("1200x1200"),

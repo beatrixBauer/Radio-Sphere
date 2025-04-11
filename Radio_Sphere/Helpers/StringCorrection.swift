@@ -5,8 +5,6 @@
 //  Created by Beatrix Bauer on 02.04.25.
 //
 
-
-
 // MARK: dient der richtigen Darstellung der Metadaten
 // Handling von Sonderzeichen für die richtige Darstellung der Metadaten, wie Songtitel oder Künstler
 
@@ -20,7 +18,7 @@ extension String {
             .utf8,                  // UTF-8 (Fallback)
             .ascii                  // ASCII als letzte Instanz
         ]
-        
+
         for encoding in potentialEncodings {
             if let data = self.data(using: encoding),
                let decodedString = String(data: data, encoding: .utf8) {
@@ -29,10 +27,8 @@ extension String {
                 }
             }
         }
-        
+
         // Fallback: Originalstring zurückgeben, wenn keine Kodierung passt
         return self
     }
 }
-
-

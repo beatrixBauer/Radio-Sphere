@@ -5,7 +5,6 @@
 //  Created by Beatrix Bauer on 02.04.25.
 //
 
-
 import SwiftUI
 
 // MARK: Definiert das Aussehen der Stationen in der Listendarstellung mit Radiostationen

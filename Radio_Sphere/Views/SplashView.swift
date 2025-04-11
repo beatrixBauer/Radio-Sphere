@@ -27,7 +27,7 @@ struct SplashView: View {
                         // Lese die Launch-Argumente aus, um zu entscheiden, wie lange der SplashScreen angezeigt werden soll.
                         let arguments = ProcessInfo.processInfo.arguments
                         let delay: TimeInterval = arguments.contains("UITest_SplashView") ? 6.0 : 4.0
-                        
+
                         DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
                             withAnimation {
                                 isActive = true

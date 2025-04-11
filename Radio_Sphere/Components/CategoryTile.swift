@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-
 // MARK: Ansicht Kategorien-Kachel
 
 struct CategoryTile<BackgroundStyle: ShapeStyle>: View {
@@ -19,7 +18,7 @@ struct CategoryTile<BackgroundStyle: ShapeStyle>: View {
             RoundedRectangle(cornerRadius: 12)
                 .fill(background)
                 .frame(height: 120)
-            
+
             Text(title)
                 .font(.headline)
                 .foregroundColor(.white)
@@ -27,5 +26,3 @@ struct CategoryTile<BackgroundStyle: ShapeStyle>: View {
         }
     }
 }
-
-

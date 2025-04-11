@@ -5,7 +5,6 @@
 //  Created by Beatrix Bauer on 06.05.25.
 //
 
-
 import XCTest
 @testable import Radio_Sphere
 
@@ -40,7 +39,7 @@ final class RecentsManagerTests: XCTestCase {
         manager.addRecentStation("station1")
         manager.addRecentStation("station2")
         XCTAssertFalse(manager.recentStationIDs.isEmpty, "Die Liste sollte Einträge enthalten.")
-        
+
         manager.clearRecents()
         XCTAssertTrue(manager.recentStationIDs.isEmpty, "Die Liste sollte geleert worden sein.")
     }

@@ -41,11 +41,11 @@ struct RadioStation: Identifiable, Codable, Equatable, Hashable {
         case geo_lat
         case geo_long
     }
-    
+
     // Standardwerte für optionale Felder
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        
+
         id = try container.decode(String.self, forKey: .id)
         name = try container.decode(String.self, forKey: .name)
         url = try container.decode(String.self, forKey: .url)
@@ -59,7 +59,7 @@ struct RadioStation: Identifiable, Codable, Equatable, Hashable {
         codec = try? container.decode(String?.self, forKey: .codec)
         clickcount = try container.decode(Int.self, forKey: .clickcount)
         hasExtendedInfo = try container.decodeIfPresent(Bool.self, forKey: .hasExtendedInfo) ?? false
-        
+
         // Sicheres Dekodieren von geo_lat und geo_long
         if let latString = try? container.decode(String.self, forKey: .geo_lat),
            let lat = Double(latString) {
@@ -69,7 +69,7 @@ struct RadioStation: Identifiable, Codable, Equatable, Hashable {
         } else {
             geo_lat = nil
         }
-        
+
         if let lonString = try? container.decode(String.self, forKey: .geo_long),
            let lon = Double(lonString) {
             geo_long = lon
@@ -79,7 +79,7 @@ struct RadioStation: Identifiable, Codable, Equatable, Hashable {
             geo_long = nil
         }
     }
-    
+
     static func == (lhs: RadioStation, rhs: RadioStation) -> Bool {
         return lhs.id == rhs.id &&
                lhs.name == rhs.name &&
@@ -96,7 +96,7 @@ struct RadioStation: Identifiable, Codable, Equatable, Hashable {
         }
         return false
     }
-    
+
     // MARK: - Dekodierte Eigenschaften zur Korrektur von Sonderzeichen
 
     var decodedName: String {
@@ -106,11 +106,11 @@ struct RadioStation: Identifiable, Codable, Equatable, Hashable {
     var decodedTags: String? {
         return tags?.fixEncoding()
     }
-    
+
     var decodedCountry: String {
         return country.fixEncoding()
     }
-    
+
     var decodedLanguage: String {
         return language.fixEncoding()
     }

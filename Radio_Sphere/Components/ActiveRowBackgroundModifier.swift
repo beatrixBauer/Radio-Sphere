@@ -5,7 +5,6 @@
 //  Created by Beatrix Bauer on 09.04.25.
 //
 
-
 import SwiftUI
 
 struct ActiveRowBackgroundModifier: ViewModifier {

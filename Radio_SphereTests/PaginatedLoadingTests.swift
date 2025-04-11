@@ -7,36 +7,35 @@
 
 import XCTest
 
-
 class PaginatedLoadingTests: XCTestCase {
     var radioAPI: RadioAPI!
-    
+
     override func setUp() {
         super.setUp()
-        
+
         // Erstelle eine URLSession mit einer ephemeralen Konfiguration und setze den MockURLProtocol
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [MockURLProtocol.self]
         let session = URLSession(configuration: configuration)
-        
+
         // Injektion der Test-Session in RadioAPI
         radioAPI = RadioAPI(session: session)
-        
+
         // Simuliere eine Mobilfunkverbindung, damit der DataManager den paginierten Zweig wählt
         NetworkMonitor.shared.connectionType = .cellular
-        
+
         // Entferne vorhandene Stationsdaten im Documents-Verzeichnis, damit ein sauberer Zustand vorliegt
         let fileManager = FileManager.default
         let docsURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0]
         let fileURL = docsURL.appendingPathComponent("stations.json")
         try? fileManager.removeItem(at: fileURL)
     }
-    
+
     override func tearDown() {
         URLProtocol.unregisterClass(MockURLProtocol.self)
         super.tearDown()
     }
-    
+
     func testPaginatedLoading() {
         // Konfiguriere den Request-Handler, der je nach Offset unterschiedliche JSON-Antworten liefert
         MockURLProtocol.requestHandler = { request in
@@ -45,14 +44,14 @@ class PaginatedLoadingTests: XCTestCase {
             else {
                 throw NSError(domain: "Invalid URL", code: 0, userInfo: nil)
             }
-            
+
             // Lese den "offset"-Parameter aus der URL (Standardwert: 0)
             let offsetItem = components.queryItems?.first(where: { $0.name == "offset" })
             let offsetString = offsetItem?.value ?? "0"
             let offset = Int(offsetString) ?? 0
-            
+
             var stationsArray: [[String: Any]] = []
-            
+
             if offset == 0 {
                 // Erste Seite: 3 Sender
                 stationsArray = [
@@ -105,20 +104,20 @@ class PaginatedLoadingTests: XCTestCase {
                 // Ab Offset 2000: keine Sender – Ende der Pagination
                 stationsArray = []
             }
-            
+
             let data = try JSONSerialization.data(withJSONObject: stationsArray, options: [])
             let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil)!
             return (response, data)
         }
-        
+
         let initialExpectation = expectation(description: "Initialer Abruf abgeschlossen")
         let paginationExpectation = expectation(description: "Pagination abgeschlossen")
-        
+
         // Starte den Abruf der ersten Seite
         radioAPI.fetchStations(offset: 0, limit: 1000) { initialStations in
             XCTAssertEqual(initialStations.count, 3, "Der initiale Abruf sollte 3 Sender liefern.")
             initialExpectation.fulfill()
-            
+
             // Abruf der zweiten Seite
             self.radioAPI.fetchStations(offset: 1000, limit: 1000) { nextStations in
                 XCTAssertEqual(nextStations.count, 2, "Der zweite Abruf sollte 2 Sender liefern.")
@@ -128,7 +127,7 @@ class PaginatedLoadingTests: XCTestCase {
                 paginationExpectation.fulfill()
             }
         }
-        
+
         wait(for: [initialExpectation, paginationExpectation], timeout: 5.0)
     }
 }

@@ -5,9 +5,7 @@
 //  Created by Beatrix Bauer on 12.04.25.
 //
 
-
 import Foundation
-
 
 // MARK: Verwalten die Favorisierten Sender
 
@@ -28,7 +26,7 @@ class FavoritesManager: ObservableObject {
         guard !favoriteStationIDs.contains(station.id) else { return }
         favoriteStationIDs.insert(station.id, at: 0)
         saveFavorites()
-        
+
         print("Favorit hinzugefügt: \(station.name) [ID: \(station.id)]")
         print("Aktuelle Favoriten: \(favoriteStationIDs)")
     }
@@ -37,7 +35,7 @@ class FavoritesManager: ObservableObject {
     func removeFavorite(station: RadioStation) {
         favoriteStationIDs.removeAll { $0 == station.id }
         saveFavorites()
-        
+
         print("Favorit entfernt: \(station.name) [ID: \(station.id)]")
         print("Aktuelle Favoriten: \(favoriteStationIDs)")
     }

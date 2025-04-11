@@ -8,18 +8,18 @@
 import SwiftUI
 
 struct ContentView: View {
-    
+
     @StateObject private var manager = StationsManager.shared
     @State private var isInStationsView = false
-    
+
     // Radiokategorien ohne "Zuletzt gehört" & "Favoriten"
     let categories = RadioCategory.allCases.filter { $0 != .recent && $0 != .favorites }
-    
+
     let columns = [
         GridItem(.flexible(), spacing: 16),
         GridItem(.flexible(), spacing: 16) // 2 Spalten
     ]
-    
+
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -44,9 +44,6 @@ struct ContentView: View {
         .preferredColorScheme(.dark)
     }
 }
-
-    
-
 
 #Preview {
     ContentView()

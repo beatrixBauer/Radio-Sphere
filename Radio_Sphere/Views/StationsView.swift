@@ -4,7 +4,6 @@
 //
 //  Created by Beatrix Bauer on 01.04.25.
 
-
 import SwiftUI
 
 // MARK: Anzeige der Liste mit Radiostationen
@@ -15,14 +14,14 @@ struct StationsView: View {
     @StateObject private var manager = StationsManager.shared
     let category: RadioCategory
     @State private var isNavigatingToPlayerView = false
-    
+
     var body: some View {
         NavigationStack {
             let filteredStations = manager.filteredStationsByCategory[category] ?? []
             let toolbarTitle = LocalizedStringKey("Hörwelten")
-            
+
             Group {
-                
+
                 if category == .favorites {
                     FavoritesListView(filteredStations: filteredStations) {
                         updateFilteredStations()
@@ -96,10 +95,10 @@ struct StationsView: View {
         }
         .preferredColorScheme(.dark)
     }
-    
+
     /// Behandelt das Verhalten bei Ansichtserscheinen
     private func handleOnAppear() {
-        
+
         switch category {
         case .recent:
             manager.filterByRecentStations()
@@ -118,7 +117,7 @@ struct StationsView: View {
             updateFilteredStations()
         }
     }
-    
+
     /// Aktualisiert die gefilterte Liste für die aktuell ausgewählte Kategorie
     private func updateFilteredStations() {
         DispatchQueue.main.async {
@@ -133,7 +132,3 @@ struct StationsView: View {
     }
 
 }
-
-
-
-

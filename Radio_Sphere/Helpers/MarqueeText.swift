@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-
 // MARK: Animierter Stationsname in der PlayerView, falls der Name für die Anzeige zu lang ist
 
 struct MarqueeText: View {
@@ -53,8 +52,3 @@ struct MarqueeText: View {
         return text.size(withAttributes: attributes).width
     }
 }
-
-
-
-
-

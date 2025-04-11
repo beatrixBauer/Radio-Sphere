@@ -11,7 +11,6 @@ import SwiftUI
 
 // MARK: Erstellt die AlbumCover-Ansicht in der PlayerView
 
-
 struct AlbumArtworkView: View {
     let artworkURL: URL?
     let frameWidth: CGFloat
@@ -65,6 +64,3 @@ struct AlbumArtworkView: View {
         .cornerRadius(10)
     }
 }
-
-
-

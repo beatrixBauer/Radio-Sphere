@@ -5,7 +5,6 @@
 //  Created by Beatrix Bauer on 06.05.25.
 //
 
-
 import XCTest
 @testable import Radio_Sphere
 
@@ -14,26 +13,26 @@ import XCTest
 class MBStubURLProtocol: URLProtocol {
     // StubResponses: Key = Teil des Hostnamens, Value = (data, statusCode, error)
     static var stubResponses: [String: (data: Data?, statusCode: Int, error: Error?)] = [:]
-    
+
     static func reset() {
         stubResponses = [:]
     }
-    
+
     override class func canInit(with request: URLRequest) -> Bool {
         // Alle Requests abfangen
         return true
     }
-    
+
     override class func canonicalRequest(for request: URLRequest) -> URLRequest {
         return request
     }
-    
+
     override func startLoading() {
         guard let host = request.url?.host else {
             client?.urlProtocolDidFinishLoading(self)
             return
         }
-        
+
         // Suche nach einem passenden Stub anhand des Hostnamens
         for (key, response) in MBStubURLProtocol.stubResponses {
             if host.contains(key) {
@@ -56,7 +55,7 @@ class MBStubURLProtocol: URLProtocol {
         // Falls kein Stub gefunden wird:
         client?.urlProtocolDidFinishLoading(self)
     }
-    
+
     override func stopLoading() {
         // Nicht erforderlich
     }
@@ -64,7 +63,7 @@ class MBStubURLProtocol: URLProtocol {
 
 // MARK: MusicBrainzAPITests
 final class MusicBrainzAPITests: XCTestCase {
-    
+
     override func setUp() {
         super.setUp()
         // Registriere unseren MBStubURLProtocol global
@@ -72,13 +71,13 @@ final class MusicBrainzAPITests: XCTestCase {
         config.protocolClasses = [MBStubURLProtocol.self]
         URLProtocol.registerClass(MBStubURLProtocol.self)
     }
-    
+
     override func tearDown() {
         URLProtocol.unregisterClass(MBStubURLProtocol.self)
         MBStubURLProtocol.reset()
         super.tearDown()
     }
-    
+
     /// Testet den Erfolgsfall: Die MusicBrainzAPI soll anhand des Dummy-JSON eine Release-ID extrahieren
     /// und anschließend über CoverArtArchive einen Erfolg simulieren.
     func testGetAlbumCover_Success() {
@@ -94,7 +93,7 @@ final class MusicBrainzAPITests: XCTestCase {
             ]
         }
         """.data(using: .utf8)
-        
+
         // StubResponses für die beiden angefragten Hosts:
         MBStubURLProtocol.stubResponses = [
             // MusicBrainz-Antwort
@@ -103,7 +102,7 @@ final class MusicBrainzAPITests: XCTestCase {
             // da die Methode nur den Request-URL zurückliefert.
             "coverartarchive.org": (data: nil, statusCode: 200, error: nil)
         ]
-        
+
         let expectation = self.expectation(description: "MusicBrainz getAlbumCover")
         MusicBrainzAPI.shared.getAlbumCover(artistName: "Test Artist", trackTitle: "Test Track") { result in
             switch result {
@@ -118,7 +117,7 @@ final class MusicBrainzAPITests: XCTestCase {
         }
         waitForExpectations(timeout: 5)
     }
-    
+
     /// Testet den Fehlerfall, wenn die MusicBrainz-Antwort keine Aufnahmen enthält.
     func testGetAlbumCover_NoRecordings() {
         // Dummy JSON-Antwort, bei der recordings leer ist
@@ -130,7 +129,7 @@ final class MusicBrainzAPITests: XCTestCase {
         MBStubURLProtocol.stubResponses = [
             "musicbrainz.org": (data: emptyMBJSON, statusCode: 200, error: nil)
         ]
-        
+
         let expectation = self.expectation(description: "MusicBrainz no recordings")
         MusicBrainzAPI.shared.getAlbumCover(artistName: "Test Artist", trackTitle: "Test Track") { result in
             switch result {

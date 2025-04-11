@@ -19,28 +19,28 @@ class RadioAPI {
     }
     private var limit = "1000"
     private let userAgent = "Radio Sphere/0.1 (iOS; beatrix.bauer@gmail.com)"
-    
+
     // Initializer mit übergebener URLSession – Standard ist URLSession.shared
     init(session: URLSession = .shared) {
         self.session = session
     }
-    
+
     /// Ruft alle Stationen remote ab (nur HTTPS-Sender)
     func fetchAllStations(completion: @escaping ([RadioStation]) -> Void) {
         let remoteURL = baseURL + "/search?hidebroken=true&lastcheckok=1&is_https=true"
         performRequest(urlString: remoteURL, completion: completion)
     }
-    
+
     /// Abfrage aller Stationen im Mobilfunknetzt mit limit und Pagination
     func fetchStations(offset: Int, limit: Int, completion: @escaping ([RadioStation]) -> Void) {
         let remoteURL = baseURL + "/search?hidebroken=true&lastcheckok=1&is_https=true&offset=\(offset)&limit=\(limit)"
         performRequest(urlString: remoteURL, completion: completion)
     }
-    
+
     private func performRequest(urlString: String, completion: @escaping ([RadioStation]) -> Void) {
         attemptRequest(urlString: urlString, remainingBaseURLs: availableBaseURLs, completion: completion)
     }
-    
+
     private func attemptRequest(urlString: String, remainingBaseURLs: [String], completion: @escaping ([RadioStation]) -> Void) {
         guard let url = URL(string: urlString) else {
             print("Fehler: Ungültige URL")
@@ -49,7 +49,7 @@ class RadioAPI {
         }
         var request = URLRequest(url: url)
         request.setValue(userAgent, forHTTPHeaderField: "User-Agent")
-        
+
         session.dataTask(with: request) { data, response, error in
             // Bei einem Fehler wird ein alternativer Server versucht
             if let error = error {
@@ -71,17 +71,17 @@ class RadioAPI {
                 completion([])
                 return
             }
-            
+
             if let httpResponse = response as? HTTPURLResponse {
                 print("Server-Antwort: Status Code \(httpResponse.statusCode)")
             }
-            
+
             guard let data = data else {
                 print("Fehler: Keine Daten erhalten")
                 completion([])
                 return
             }
-            
+
             do {
                 let decodedData = try JSONDecoder().decode([RadioStation].self, from: data)
                 DispatchQueue.main.async {
@@ -93,7 +93,7 @@ class RadioAPI {
             }
         }.resume()
     }
-    
+
     // Ermittlung der verfügbaren Server von Radio-Browser (DE soll bevorzugt werden)
     func getRadioBrowserBaseURLs() -> [String] {
         let fallbackURLs = [
@@ -141,13 +141,3 @@ class RadioAPI {
         return urls.isEmpty ? fallbackURLs : urls
     }
 }
-
-
-
-
-
-
-
-
-
-

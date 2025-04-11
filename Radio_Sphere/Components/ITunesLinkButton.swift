@@ -44,7 +44,7 @@ struct ITunesLinkButton: View {
                 RoundedRectangle(cornerRadius: 10)
                     .stroke(Color.white, lineWidth: 1)
             )
-            
+
         }
     }
 }
@@ -52,4 +52,3 @@ struct ITunesLinkButton: View {
 #Preview {
     ITunesLinkButton(trackUrl: URL(string: "https://itunes.apple.com/de/album/id1477471331")!)
 }
-

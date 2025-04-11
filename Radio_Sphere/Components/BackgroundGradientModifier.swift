@@ -5,9 +5,7 @@
 //  Created by Beatrix Bauer on 22.04.25.
 //
 
-
 import SwiftUI
-
 
 // MARK: Wiederverwendbarer Farbverlauf wird als Modifier aufgerufen
 

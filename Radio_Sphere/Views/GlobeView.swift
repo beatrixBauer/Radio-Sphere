@@ -55,7 +55,7 @@ struct GlobeView: View {
         withAnimation(.easeInOut(duration: 1.5)) {
             scaleEffect = 1.5
         }
-        
+
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             withAnimation(.easeInOut(duration: 1.5)) {
                 scaleEffect = 1.0
@@ -101,10 +101,3 @@ struct GlobeView_Previews: PreviewProvider {
             .previewDevice("iPhone 14 Pro")
     }
 }
-
-
-
-
-
-
-

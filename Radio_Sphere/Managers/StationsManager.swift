@@ -11,12 +11,12 @@ import MediaPlayer
 import Combine
 
 class StationsManager: ObservableObject, FRadioPlayerDelegate {
-    
+
     static let shared = StationsManager()
     private let locationManager = LocationManager.shared
     var radioAPI = RadioAPI()
     @Published var isInitialized: Bool = false
-    
+
     @Published var allStations: [RadioStation] = [] {
         didSet {
             // Alle Kategorien, werden aktualisiert
@@ -32,17 +32,17 @@ class StationsManager: ObservableObject, FRadioPlayerDelegate {
     @Published var stations: [RadioStation] = []
     @Published var stationsByCategory: [RadioCategory: [RadioStation]] = [:] // Dictionary mit verschiedenen Listen nach Kategorie
     @Published var filteredStationsByCategory: [RadioCategory: [RadioStation]] = [:] // Dictionary mit gefilterten Listen nach Kategorie
-    
+
     // Navigationsliste für den Player
     @Published var currentNavigationList: [RadioStation] = []
     @Published var userDidPause: Bool = false
-    
+
     // Navigationsliste für das Suchergebnis der direkten API-Suche (SearchView)
     @Published var currentSearchResults: [RadioStation] = []
-    
+
     @Published var currentStation: RadioStation?
-    @Published var currentIndex: Int? = nil
-    
+    @Published var currentIndex: Int?
+
     @Published var searchedStations: [RadioStation] = []
     @Published var errorMessage: String?
     @Published var isInPlayerView: Bool = false
@@ -53,7 +53,7 @@ class StationsManager: ObservableObject, FRadioPlayerDelegate {
     @Published var currentArtist: String = ""
     @Published var currentArtworkURL: URL?
     @Published var currentTrackURL: URL?
-    
+
     @Published var searchText: String = ""
     @Published var globalSearchText: String = ""
     @Published var searchActive = false
@@ -66,15 +66,15 @@ class StationsManager: ObservableObject, FRadioPlayerDelegate {
     private let player = FRadioPlayer.shared
    // private var currentOffset = 0
    // private var isFetching = false
-    
+
     private init() {
         player.delegate = self
         setupSearch()
         setupRemoteCommandCenter()
     }
-    
+
     // MARK: - Lokale Filterfunktionen für Senderliste
-    
+
     /// Initialisiert die Suchlogik mit Debouncing
        private func setupSearch() {
            searchCancellable = $searchText
@@ -84,20 +84,20 @@ class StationsManager: ObservableObject, FRadioPlayerDelegate {
                    self?.handleSearchTextChange(text)
                }
        }
-       
+
        /// Aktiviert die Suchfunktion
        func activateSearch() {
            searchActive = true
            print("Suche aktiviert.")
        }
-       
+
        /// Deaktiviert die Suchfunktion
        func deactivateSearch() {
            searchActive = false
            searchedStations = []
            print("Suche deaktiviert und Liste zurückgesetzt.")
        }
-    
+
     /// Handhabt Änderungen im Suchtext
     func handleSearchTextChange(_ text: String) {
         if text.isEmpty && searchActive {
@@ -110,7 +110,7 @@ class StationsManager: ObservableObject, FRadioPlayerDelegate {
             print("Suchfeld geleert, aber Suche bleibt aktiv.")
         }
     }
-    
+
     /// Wendet die Suchfilter auf die Senderliste an
     private func applySearchFilter(with text: String) {
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
@@ -120,13 +120,13 @@ class StationsManager: ObservableObject, FRadioPlayerDelegate {
                 station.decodedName.lowercased().contains(lowercasedText) ||
                 (station.decodedTags?.lowercased().contains(lowercasedText) ?? false)
             }
-            
+
             DispatchQueue.main.async {
                 self.searchedStations = results
             }
         }
     }
-    
+
     /// setzt die Filter zurück, aber nur einmal pro Zyklus
     func resetFilters() {
         guard !filtersWereReset else { return }
@@ -148,7 +148,7 @@ class StationsManager: ObservableObject, FRadioPlayerDelegate {
     /// Wendet die lokalen Filter auf die Senderliste an
     func applyFilters(to category: RadioCategory) -> [RadioStation] {
         var results = getStations(for: category)
-        
+
         // Filterung nach Suchtext
         if searchActive, !searchText.isEmpty {
             results = results.filter { station in
@@ -156,30 +156,30 @@ class StationsManager: ObservableObject, FRadioPlayerDelegate {
                 (station.decodedTags?.lowercased().contains(searchText.lowercased()) ?? false)
             }
         }
-        
+
         // Filterung nach ausgewähltem Land
         if selectedCountry != "Alle" {
             results = results.filter { station in
                 station.decodedCountry == selectedCountry
             }
         }
-        
+
         // Sortierung nach Alphabet
         if alphabetical {
             results.sort { $0.decodedName < $1.decodedName }
         }
-        
+
         return results
     }
-    
+
     /// filtert doppelte Stationen raus
     func filterUniqueStationsAndSortByCountry(for category: RadioCategory) {
         // 1. Filtere alle Sender anhand der Kategorie
         let filteredStations = filterStations(for: category)
-        
+
         // 2. Entferne Duplikate basierend auf decodedName
         var uniqueStations = filterUniqueStationsByName(filteredStations)
-        
+
         // 3. Bestimme den bevorzugten Countrycode
         let preferredCountryCode: String = {
             if let currentCode = LocationManager.shared.countryCode {
@@ -190,7 +190,7 @@ class StationsManager: ObservableObject, FRadioPlayerDelegate {
                 return "DE" // Fallback
             }
         }()
-        
+
         // 4. Sortiere so, dass Sender mit dem bevorzugten Countrycode ganz oben stehen,
         //    danach werden die restlichen alphabetisch (z. B. nach Countrycode) sortiert.
         uniqueStations.sort { (a, b) -> Bool in
@@ -204,17 +204,16 @@ class StationsManager: ObservableObject, FRadioPlayerDelegate {
                 return codeA < codeB
             }
         }
-        
+
         // 5. Speichere das Ergebnis
         self.stationsByCategory[category] = uniqueStations
         print("Kategorie \(category.rawValue) hat \(uniqueStations.count) eindeutige Sender geladen (sortiert nach Countrycode, \(preferredCountryCode) zuerst).")
     }
 
-    
     /// filtert allStations nach der Kategory
     func filterStations(for category: RadioCategory) -> [RadioStation] {
         print("Anzahl in allStations: \(allStations.count)")
-        
+
         // Standardfilterung anhand der Tags
         let searchTags = category.tags.map { $0.lowercased() }
         let tagResults = allStations.filter { station in
@@ -229,7 +228,7 @@ class StationsManager: ObservableObject, FRadioPlayerDelegate {
                 stationTags.contains(searchTag)
             }
         }
-        
+
         // Für bestimmte Kategorien sollen zusätzlich Ergebnisse basierend auf dem Namen berücksichtigt werden.
         var nameResults: [RadioStation] = []
         switch category {
@@ -253,7 +252,7 @@ class StationsManager: ObservableObject, FRadioPlayerDelegate {
             // Für alle anderen Kategorien keine zusätzliche Namenssuche
             break
         }
-        
+
         // Ergebnisse kombinieren und Duplikate entfernen
         var combinedResults = tagResults
         if !nameResults.isEmpty {
@@ -269,11 +268,10 @@ class StationsManager: ObservableObject, FRadioPlayerDelegate {
                 }
             }
         }
-        
+
         return combinedResults
     }
-    
-    
+
     /// Ruft alle Stationen über den DataManager ab und speichert sie in allStations.
     func loadStations(completion: @escaping () -> Void) {
         DataManager.shared.getAllStations { [weak self] stations in
@@ -284,7 +282,7 @@ class StationsManager: ObservableObject, FRadioPlayerDelegate {
             }
         }
     }
-    
+
     // updated filteredStations, welche an die PlayerView übergeben wird
     private func updateFilteredStations(for category: RadioCategory) {
         let filtered = applyFilters(to: category)
@@ -293,13 +291,12 @@ class StationsManager: ObservableObject, FRadioPlayerDelegate {
             print("`filteredStations` für \(category.rawValue) aktualisiert: \(filtered.count) Sender")
         }
     }
-    
-    
+
     /// Gibt die Sender für eine bestimmte Kategorie zurück (leeres Array, falls nicht geladen)
     func getStations(for category: RadioCategory) -> [RadioStation] {
         return stationsByCategory[category] ?? []
     }
-    
+
     // MARK: Lokale Suche in allStations (Name und Genre)
     func performGlobalSearch(completion: @escaping () -> Void) {
         guard !globalSearchText.isEmpty else {
@@ -308,9 +305,9 @@ class StationsManager: ObservableObject, FRadioPlayerDelegate {
             completion()
             return
         }
-        
+
         let queryLower = globalSearchText.lowercased()
-        
+
         // Suche nach Sendernamen und Tags (Genre)
         let results = allStations.filter { station in
             // Hier gehen wir davon aus, dass station.decodedName und station.decodedTags
@@ -318,9 +315,9 @@ class StationsManager: ObservableObject, FRadioPlayerDelegate {
             return station.decodedName.lowercased().contains(queryLower) ||
                    (station.decodedTags?.lowercased().contains(queryLower) ?? false)
         }
-        
+
         let uniqueStations = filterUniqueStationsByName(results)
-        
+
         DispatchQueue.main.async {
             self.searchedStations = uniqueStations
             self.currentSearchResults = uniqueStations
@@ -328,7 +325,6 @@ class StationsManager: ObservableObject, FRadioPlayerDelegate {
         }
     }
 
-    
     /// Fragt die favorisierten Stationen ab und aktualisiert sowohl das Kategorie-Dictionary als auch die gefilterte Stations-Liste.
     func filterByFavoriteStations() {
         let favoriteIDs = FavoritesManager.shared.favoriteStationIDs
@@ -349,27 +345,25 @@ class StationsManager: ObservableObject, FRadioPlayerDelegate {
             self.filteredStationsByCategory[category] = []
             return
         }
-        
+
         // Filtere die Sender, deren ID in der übergebenen Liste enthalten ist (case-insensitive)
         let filteredStations = allStations.filter { station in
             ids.contains { id in
                 station.id.lowercased() == id.lowercased()
             }
         }
-        
+
         // Sortiere die gefilterten Sender entsprechend der Reihenfolge der IDs
         let sortedStations = ids.compactMap { id in
             filteredStations.first(where: { $0.id.lowercased() == id.lowercased() })
         }
-        
+
         DispatchQueue.main.async {
             self.stationsByCategory[category] = sortedStations
             self.filteredStationsByCategory[category] = sortedStations
             print("\(category.rawValue.capitalized) geladen: \(sortedStations.count) Sender")
         }
     }
-
-
 
     /// Filtert Sender mit doppelten Namen heraus (basierend auf decodedName)
     func filterUniqueStationsByName(_ stations: [RadioStation]) -> [RadioStation] {
@@ -384,7 +378,7 @@ class StationsManager: ObservableObject, FRadioPlayerDelegate {
             return true
         }
     }
-    
+
     /// Sucht lokale Sender und sortiert sie nach Distanz
     func fetchLocalStations() {
         let locationManager = LocationManager.shared
@@ -392,8 +386,8 @@ class StationsManager: ObservableObject, FRadioPlayerDelegate {
         // Hole Standortinformationen, mit Fallbacks, falls nichts vorhanden ist
         _ = locationManager.countryCode ?? Locale.current.region?.identifier ?? "DE"
         let state = locationManager.state ?? ""
-        //let lat = locationManager.currentLocation?.coordinate.latitude ?? 0.0
-        //let lon = locationManager.currentLocation?.coordinate.longitude ?? 0.0
+        // let lat = locationManager.currentLocation?.coordinate.latitude ?? 0.0
+        // let lon = locationManager.currentLocation?.coordinate.longitude ?? 0.0
 
         // Nutze die globalen Sender aus allStations
         let allStationsGlobal = self.allStations
@@ -437,20 +431,19 @@ class StationsManager: ObservableObject, FRadioPlayerDelegate {
             print("Kombinierte lokale Sender geladen: \(sortedStations.count) Sender")
         }
     }
-    
-    
+
     /// Ermittelt aus einer angezeigten Liste mit Radiostationen die verschiedenen Länder für die Filterung nach Land
     func getAvailableCountries(for category: RadioCategory) -> [String] {
         let stations = getStations(for: category)
         let countries = stations.map { $0.decodedCountry }
         return Array(Set(countries)).sorted()
     }
-    
+
     /// Überprüft, ob die Sender für eine Kategorie bereits geladen wurden
     func isCategoryLoaded(_ category: RadioCategory) -> Bool {
         return stationsByCategory[category] != nil
     }
-    
+
     /// Sucht lokal nach Stationen mit Suchtext
     func searchStations() {
         guard !searchText.isEmpty else {
@@ -460,7 +453,7 @@ class StationsManager: ObservableObject, FRadioPlayerDelegate {
         }
 
         print("Starte lokale Suche nach: \(searchText)")
-        
+
         // Lokale Suche durch Filterung der bereits geladenen Stationen
         searchedStations = stations.compactMap { $0 }.filter { station in
             station.decodedName.lowercased().contains(searchText.lowercased()) ||
@@ -469,9 +462,8 @@ class StationsManager: ObservableObject, FRadioPlayerDelegate {
         self.objectWillChange.send()
     }
 
-    
     // MARK: Funktionen zur Playerbedienung über das Commandcenter
-    
+
     private func setupRemoteCommandCenter() {
         let commandCenter = MPRemoteCommandCenter.shared()
 
@@ -507,10 +499,9 @@ class StationsManager: ObservableObject, FRadioPlayerDelegate {
             return .success
         }
     }
-    
-    
+
     // MARK: - Übermittlung der Radiostationen an den Player
-    
+
     /// Setzt den ausgewählten Sender
     func set(station: RadioStation) {
         // Wenn derselbe Sender erneut gewählt wird, setze den Pause-Flag zurück und starte den Sender.
@@ -519,20 +510,18 @@ class StationsManager: ObservableObject, FRadioPlayerDelegate {
             player.play()
             return
         }
-        
+
         // Beim Wechsel eines Senders wird der Pause-Flag zurückgesetzt.
         userDidPause = false
         currentStation = station
         resetMetadata()
         player.radioURL = URL(string: station.url)
         player.play()
-        
+
         print("Rohname: \(station.name)")
         print("Dekodierter Name: \(station.decodedName)")
     }
 
-
-    
     /// Legt die aktuelle Navigationliste fest und bereitet den Player vor.
     func prepareForPlayback(station: RadioStation, in list: [RadioStation]) {
         // Nur aktualisieren, wenn ein neuer Sender ausgewählt wurde
@@ -543,10 +532,10 @@ class StationsManager: ObservableObject, FRadioPlayerDelegate {
             currentIndex = list.firstIndex { $0.id == station.id }
             print("PlayerView: currentIndex gesetzt auf \(currentIndex ?? -1)")
         }
-        
+
         RecentsManager.shared.addRecentStation(station.id)
     }
-    
+
     /// Schaltet auf die vorherige Station in der aktuellen Navigationsliste um
     func setPrevious() {
         guard let index = currentIndex, index > 0,
@@ -554,13 +543,13 @@ class StationsManager: ObservableObject, FRadioPlayerDelegate {
             print("Kein vorheriger Sender verfügbar.")
             return
         }
-        
+
         let prevStation = currentNavigationList[index - 1]
         currentIndex = index - 1
         set(station: prevStation)
         print("Wechsle zu: \(prevStation.decodedName) (Index: \(currentIndex!))")
     }
-    
+
     /// Schaltet auf die nächste Station in der aktuellen Navigationsliste um
     func setNext() {
         guard let index = currentIndex,
@@ -568,26 +557,26 @@ class StationsManager: ObservableObject, FRadioPlayerDelegate {
             print("Kein nächster Sender verfügbar.")
             return
         }
-        
+
         let nextStation = currentNavigationList[index + 1]
         currentIndex = index + 1
         set(station: nextStation)
         print("Wechsle zu: \(nextStation.decodedName) (Index: \(currentIndex!))")
     }
-    
+
     // MARK: - Playerbedienung
     /// Stoppt die Wiedergabe
     func stopPlayback() {
         player.stop()
         resetMetadata()
     }
-    
+
     /// Pausiert die Wiedergabe
     func pausePlayback() {
         userDidPause = true
         player.pause()
     }
-    
+
     // MARK: - Metadatenverwaltung
     /// Setzt Metadaten zurück, wenn kein Song läuft
     private func resetMetadata() {
@@ -596,14 +585,13 @@ class StationsManager: ObservableObject, FRadioPlayerDelegate {
         currentArtworkURL = nil
         updateLockScreen()
     }
-    
+
     /// Gibt den Index eines Senders in der Liste zurück
     private func getIndex(of station: RadioStation?) -> Int? {
         guard let station = station else { return nil }
         return stations.firstIndex(of: station)
     }
-    
-    
+
     // MARK: - Wird aufgerufen, wenn Metadaten sich ändern (Songtitel & Künstler)
     func radioPlayer(_ player: FRadioPlayer, metadataDidChange artistName: String?, trackName: String?) {
         DispatchQueue.main.async {
@@ -616,22 +604,22 @@ class StationsManager: ObservableObject, FRadioPlayerDelegate {
                 // Wenn es keine Leerzeichen enthält und länger als 10 Zeichen ist, könnte es sich um einen Code handeln.
                 return !trimmed.contains(" ") && trimmed.count > 20
             }
-            
+
             // Bereinige Artist und Track (nur zum Vergleichen)
             let cleanedArtist = artistName?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() ?? ""
             let cleanedTrack = trackName?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() ?? ""
-            
+
             // Standardwerte für Artist und Track setzen:
             var displayArtist = self.currentStation?.name ?? "Unbekannter Sender"
             var displayTrack = "On Air"
-            
+
             // Wenn der empfangene Artist-String mit "{" beginnt, verwenden wir den Fallback
             if let trimmedArtist = artistName?.trimmingCharacters(in: .whitespacesAndNewlines), trimmedArtist.first == "{" {
                 displayArtist = self.currentStation?.name ?? "Unbekannter Sender"
             } else if !invalidValues.contains(cleanedArtist), let artist = artistName, !artist.isEmpty {
                 displayArtist = artist.fixEncoding()
             }
-            
+
             // Gleiches gilt für den Track: Wenn er mit "{" beginnt, Fallback verwenden
             if let trimmedTrack = trackName?.trimmingCharacters(in: .whitespacesAndNewlines), trimmedTrack.first == "{" {
                 displayTrack = "On Air"
@@ -641,23 +629,22 @@ class StationsManager: ObservableObject, FRadioPlayerDelegate {
                     displayTrack = track.fixEncoding()
                 }
             }
-            
+
             self.currentArtist = displayArtist
             self.currentTrack = displayTrack
-            
+
             print("Jetzt läuft: \(self.currentArtist) - \(self.currentTrack)")
-            
+
             // Albumcover abrufen (auch wenn "On Air", um das Sender-Logo zu laden, falls verfügbar)
             self.fetchAlbumArtwork()
         }
     }
 
-
     // MARK: Holt das Albumcover von iTunes oder Musicbrainz
     // verwendet updateLockScreen()
     private func fetchAlbumArtwork() {
         print("Suche nach Albumcover für \(self.currentArtist) - \(self.currentTrack) (iTunes zuerst, dann MusicBrainz)")
-        
+
         iTunesAPI.shared.getAlbumCover(artist: self.currentArtist, track: self.currentTrack) { coverUrl, trackUrl in
             DispatchQueue.main.async {
                 if let coverUrl = coverUrl {
@@ -671,7 +658,7 @@ class StationsManager: ObservableObject, FRadioPlayerDelegate {
                     self.updateLockScreen()
                 } else {
                     print("Kein Cover von iTunes gefunden, versuche MusicBrainz...")
-                    
+
                     // Wenn MusicBrainz genutzt wird, könntest du currentTrackURL auch auf nil setzen,
                     // falls es dort keinen Link gibt.
                     MusicBrainzAPI.shared.getAlbumCover(artistName: self.currentArtist, trackTitle: self.currentTrack) { result in
@@ -695,21 +682,20 @@ class StationsManager: ObservableObject, FRadioPlayerDelegate {
         }
     }
 
-    
     // MARK: Aktualisiert Metadaten auf dem Sperrbildschirm
     private func updateLockScreen() {
         var nowPlayingInfo: [String: Any] = [
             MPMediaItemPropertyTitle: currentTrack,
             MPMediaItemPropertyArtist: currentArtist
         ]
-        
+
         if let artworkURL = currentArtworkURL {
             DispatchQueue.global(qos: .background).async {
                 if let data = try? Data(contentsOf: artworkURL),
                    let image = UIImage(data: data) {
-                    
+
                     let artwork = MPMediaItemArtwork(boundsSize: image.size) { _ in image }
-                    
+
                     DispatchQueue.main.async {
                         nowPlayingInfo[MPMediaItemPropertyArtwork] = artwork
                         MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
@@ -720,7 +706,6 @@ class StationsManager: ObservableObject, FRadioPlayerDelegate {
             MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
         }
     }
-
 
     // MARK: reagiert auf Änderungen im allgemeinen Player-Zustand und gibt lediglich den neuen Zustand per Print aus
     func radioPlayer(_ player: FRadioPlayer, playerStateDidChange state: FRadioPlayerState) {
@@ -742,15 +727,15 @@ class StationsManager: ObservableObject, FRadioPlayerDelegate {
                 self.currentArtworkURL = nil
                 return
             }
-            
+
             // Falls bereits ein 1200x1200 Cover vorhanden ist, ignorieren wir 100x100
             if let currentURL = self.currentArtworkURL, currentURL.absoluteString.contains("1200x1200") {
                 return
             }
-            
+
             // Falls das neue Cover nur 100x100 ist, prüfen, ob wir bereits ein besseres haben
             if newArtworkURL.absoluteString.contains("100x100") {
-               
+
                 if self.currentArtworkURL == nil {
                     self.currentArtworkURL = newArtworkURL
                 } else {
@@ -764,217 +749,3 @@ class StationsManager: ObservableObject, FRadioPlayerDelegate {
     }
 
 }
-
-
-//MARK: alte Funktionen zur Api-Abfrage
-/*
- 
- /// Lädt die Sender basierend auf einer Kategorie, filtert Duplikate und sortiert nach Land (Deutschland zuerst)
- func fetchStationsByTag(for category: RadioCategory) {
-    DataManager.shared.getStationsByTag(for: category) { [weak self] stations in
-        DispatchQueue.main.async {
-            // Filtert Sender mit doppelten Namen heraus
-            var uniqueStations = self?.filterUniqueStationsByName(stations) ?? []
-            
-            // Sortiert die Sender nach Land: Deutsche Sender zuerst, dann alphabetisch nach Land
-            uniqueStations.sort { (a: RadioStation, b: RadioStation) in
-                if a.country.lowercased() == "germany" && b.country.lowercased() != "germany" {
-                    return true
-                } else if a.country.lowercased() != "germany" && b.country.lowercased() == "germany" {
-                    return false
-                } else {
-                    return a.country < b.country
-                }
-            }
-            
-            self?.stationsByCategory[category] = uniqueStations
-            print("Kategorie \(category.rawValue) hat \(uniqueStations.count) eindeutige Sender geladen (sortiert nach Land, DE zuerst).")
-            
-            // Debug-Ausgabe zur Überprüfung der Sortierung
-            /*uniqueStations.forEach { station in
-                print("Sender: \(station.decodedName) - Land: \(station.country)")
-            }*/
-        }
-    }
-}
- 
- /// fragt zuletzt gehörte Stationen ab
-func fetchRecentStations() {
-     let recentIDs = RecentsManager.shared.recentStationIDs
-
-     guard !recentIDs.isEmpty else {
-         print("Keine kürzlich gehörten Sender vorhanden.")
-         self.stationsByCategory[.recent] = []
-         self.filteredStationsByCategory[.recent] = []
-         return
-     }
-     
-     Task { [weak self] in
-         guard let self = self else { return }
-         let recentStations = await DataManager.shared.fetchStationsByIDs(recentIDs)
-
-         await MainActor.run {
-             self.stationsByCategory[.recent] = recentStations
-             self.filteredStationsByCategory[.recent] = recentStations
-             print("Zuletzt gehörte Sender geladen: \(recentStations.count) Sender")
-         }
-     }
- }
- 
- 
- /// Fragt die favorisierten Stationen ab und aktualisiert sowohl das Kategorie-Dictionary als auch die globale filteredStations-Liste.
- func fetchFavoriteStations() {
-     let favoriteIDs = FavoritesManager.shared.favoriteStationIDs
-
-     guard !favoriteIDs.isEmpty else {
-         print("Keine Favoriten vorhanden.")
-         self.stationsByCategory[.favorites] = []
-         self.filteredStationsByCategory[.favorites] = []
-         return
-     }
-     
-     Task { [weak self] in
-         guard let self = self else { return }
-         let favoriteStations = await DataManager.shared.fetchStationsByIDs(favoriteIDs)
-         await MainActor.run {
-             self.stationsByCategory[.favorites] = favoriteStations
-             self.filteredStationsByCategory[.favorites] = favoriteStations
-             print("Favoriten geladen: \(favoriteStations.count) Sender")
-         }
-     }
- }
- 
- func filterByFavoriteStations() {
-     // Hole die zuletzt gehörten Sender-IDs
-     let favoriteIDs = FavoritesManager.shared.favoriteStationIDs
-     
-     guard !favoriteIDs.isEmpty else {
-         print("Keine favorisierten Sender vorhanden.")
-         self.stationsByCategory[.favorites] = []
-         self.filteredStationsByCategory[.favorites] = []
-         return
-     }
-     
-     // Zugriff auf die Liste aller Stationen
-     let allStations = allStations
-    
-     // Filtere die Sender, deren ID in recentIDs vorkommt, case-insensitive
-     let filteredStations = allStations.filter { station in
-         favoriteIDs.contains { favoriteID in
-             station.id.lowercased() == favoriteID.lowercased()
-         }
-     }
-     
-     // Sortiere die gefilterte Liste so, dass die Reihenfolge der IDs aus recentIDs übernommen wird, auch hier case-insensitive
-     let sortedStations = favoriteIDs.compactMap { id in
-         filteredStations.first(where: { $0.id.lowercased() == id.lowercased() })
-     }
-     
-     DispatchQueue.main.async {
-         self.stationsByCategory[.favorites] = sortedStations
-         self.filteredStationsByCategory[.favorites] = sortedStations
-         print("Favorisierte Sender geladen: \(sortedStations.count) Sender")
-     }
- }
-
- 
- func filterByRecentStations() {
-     // Hole die zuletzt gehörten Sender-IDs
-     let recentIDs = RecentsManager.shared.recentStationIDs
-     
-     guard !recentIDs.isEmpty else {
-         print("Keine kürzlich gehörten Sender vorhanden.")
-         self.stationsByCategory[.recent] = []
-         self.filteredStationsByCategory[.recent] = []
-         return
-     }
-     
-     // Zugriff auf die Liste aller Stationen
-     let allStations = allStations
-     
-     // Filtere die Sender, deren ID in recentIDs vorkommt, case-insensitive
-     let filteredStations = allStations.filter { station in
-         recentIDs.contains { recentID in
-             station.id.lowercased() == recentID.lowercased()
-         }
-     }
-     
-     // Sortiere die gefilterte Liste so, dass die Reihenfolge der IDs aus recentIDs übernommen wird, auch hier case-insensitive
-     let sortedStations = recentIDs.compactMap { id in
-         filteredStations.first(where: { $0.id.lowercased() == id.lowercased() })
-     }
-     
-     DispatchQueue.main.async {
-         self.stationsByCategory[.recent] = sortedStations
-         self.filteredStationsByCategory[.recent] = sortedStations
-         print("Zuletzt gehörte Sender geladen: \(sortedStations.count) Sender")
-     }
- }
- 
- 
- 
- func fetchLocalStations() {
-     let locationManager = LocationManager.shared
-     
-     // Fallback für den Ländercode, falls der Standort nicht verfügbar ist
-     let countryCode = locationManager.countryCode ?? Locale.current.region?.identifier ?? "DE"
-     let state = locationManager.state ?? ""
-     let lat = locationManager.currentLocation?.coordinate.latitude ?? 0.0
-     let lon = locationManager.currentLocation?.coordinate.longitude ?? 0.0
-     
-     DataManager.shared.getCombinedLocalStations(
-         countryCode: countryCode,
-         state: state,
-         lat: lat,
-         lon: lon
-     ) { [weak self] stations in
-         guard let self = self else { return }
-         
-         var localStations: [RadioStation] = []
-         if stations.isEmpty {
-             // Fallback: Falls keine Sender zurückgegeben werden, filtere deutsche Sender aus allStations
-             localStations = self.allStations.filter { station in
-                 station.country.lowercased() == "de"
-             }
-             print("Fallback aktiviert – keine lokalen Sender gefunden, gefiltert: \(localStations.count) deutsche Sender")
-         } else {
-             localStations = stations
-         }
-         
-         // Sortiere die Sender basierend auf der Distanz (Sender ohne Geo-Daten kommen ans Ende)
-         let sortedStations = stations.sorted { (first, second) -> Bool in
-             let firstDistance = locationManager.getDistanceToStation(station: first) ?? Double.infinity
-             let secondDistance = locationManager.getDistanceToStation(station: second) ?? Double.infinity
-             return firstDistance < secondDistance
-         }
-
-         DispatchQueue.main.async {
-             self.stationsByCategory[.local] = sortedStations
-             print("Kombinierte lokale Sender geladen: \(sortedStations.count) Sender")
-         }
-     }
- }
- 
- // MARK: API-Suchfunktion
- // wird in der SearchView verwendet und sucht direkt in der API nach einem Stationsnamen
- func performGlobalSearch(completion: @escaping () -> Void) {
-     guard !globalSearchText.isEmpty else {
-         searchedStations = []
-         // Aktualisiere den Such-Snapshot (leere Liste)
-         currentSearchResults = []
-         completion()
-         return
-     }
-     
-     DataManager.shared.searchStationsByName(query: globalSearchText) { [weak self] stations in
-         DispatchQueue.main.async {
-             self?.searchedStations = stations
-             // Setze den stabilen Snapshot für die Suchergebnisse
-             self?.currentSearchResults = stations
-             completion()
-         }
-     }
- }
- 
- */
-

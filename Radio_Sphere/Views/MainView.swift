@@ -14,9 +14,9 @@ struct MainView: View {
     @State private var selectedTab = 0 // Speichert den aktiven Tab
     @ObservedObject private var manager = StationsManager.shared
     @ObservedObject private var networkMonitor = NetworkMonitor.shared
-    @State private var activeStation: RadioStation? = nil
+    @State private var activeStation: RadioStation?
     @State private var showNoConnectionAlert = false
-    
+
     init() {
         if ProcessInfo.processInfo.arguments.contains("UITest_NoInternet") {
             // Simuliere keine Internetverbindung, damit der Alert erscheint.
@@ -98,7 +98,6 @@ struct MainView: View {
         .preferredColorScheme(.dark)
     }
 }
-
 
 #Preview {
     MainView()

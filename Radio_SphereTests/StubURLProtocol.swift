@@ -5,7 +5,6 @@
 //  Created by Beatrix Bauer on 06.05.25.
 //
 
-
 import XCTest
 @testable import Radio_Sphere
 
@@ -17,16 +16,16 @@ class StubURLProtocol: URLProtocol {
     static var stubError: Error?
     /// Optional: definierte HTTP-Statuscode (Standard 200)
     static var responseStatusCode: Int = 200
-    
+
     override class func canInit(with request: URLRequest) -> Bool {
         // Alle Anfragen abfangen
         return true
     }
-    
+
     override class func canonicalRequest(for request: URLRequest) -> URLRequest {
         return request
     }
-    
+
     override func startLoading() {
         if let error = StubURLProtocol.stubError {
             client?.urlProtocol(self, didFailWithError: error)
@@ -36,34 +35,34 @@ class StubURLProtocol: URLProtocol {
                                            httpVersion: nil,
                                            headerFields: nil)!
             client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
-            
+
             if let data = StubURLProtocol.stubResponseData {
                 client?.urlProtocol(self, didLoad: data)
             }
         }
         client?.urlProtocolDidFinishLoading(self)
     }
-    
+
     override func stopLoading() {
         // Nicht benötigt in diesem einfachen Beispiel.
     }
 }
 
 final class RadioAPITests: XCTestCase {
-    
+
     // Wir konfigurieren eine eigene URLSession-Konfiguration, die den StubURLProtocol nutzt.
     var session: URLSession!
-    
+
     override func setUp() {
         super.setUp()
         let config = URLSessionConfiguration.ephemeral
         config.protocolClasses = [StubURLProtocol.self]
         session = URLSession(configuration: config)
-        
+
         // Wichtig: Da RadioAPI aktuell URLSession.shared nutzt, registrieren wir unseren Stub global.
         URLProtocol.registerClass(StubURLProtocol.self)
     }
-    
+
     override func tearDown() {
         URLProtocol.unregisterClass(StubURLProtocol.self)
         session = nil
@@ -72,7 +71,7 @@ final class RadioAPITests: XCTestCase {
         StubURLProtocol.responseStatusCode = 200
         super.tearDown()
     }
-    
+
     /// Testet, ob fetchAllStations() eine korrekt decodierte Station zurückliefert.
     func testFetchAllStations() {
         // Dummy JSON, das ein Array mit einem RadioStation-Objekt enthält.
@@ -98,7 +97,7 @@ final class RadioAPITests: XCTestCase {
         ]
         """.data(using: .utf8)
         StubURLProtocol.stubResponseData = dummyJSON
-        
+
         let api = RadioAPI()
         // Wir erwarten hier, dass fetchAllStations() aus dem Stub den Dummy-JSON verwendet.
         let expectation = self.expectation(description: "fetchAllStations")
@@ -109,7 +108,7 @@ final class RadioAPITests: XCTestCase {
         }
         waitForExpectations(timeout: 5)
     }
-    
+
     /// Testet, ob die paginierte Abfrage (fetchStations(offset:limit:completion:)) funktioniert.
     func testFetchStationsWithPagination() {
         // Dummy JSON für zwei Stationen
@@ -152,7 +151,7 @@ final class RadioAPITests: XCTestCase {
         ]
         """.data(using: .utf8)
         StubURLProtocol.stubResponseData = dummyJSON
-        
+
         let api = RadioAPI()
         let expectation = self.expectation(description: "fetchStations with pagination")
         api.fetchStations(offset: 1000, limit: 2) { stations in

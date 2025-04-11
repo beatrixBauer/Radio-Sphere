@@ -5,7 +5,6 @@
 //  Created by Beatrix Bauer on 06.05.25.
 //
 
-
 extension RadioStation {
     init(testID: String, testName: String, testTags: String, testCountry: String, testCountryCode: String) {
         self.id = testID
