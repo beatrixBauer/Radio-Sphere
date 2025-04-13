@@ -14,6 +14,14 @@ struct StationsView: View {
     @StateObject private var manager = StationsManager.shared
     let category: RadioCategory
     @State private var isNavigatingToPlayerView = false
+    
+    // Computed Property: Picker anzeigen nur, wenn mehr als ein Land gefunden wurde.
+    private var shouldShowCountryPicker: Bool {
+        // manager.getAvailableCountries liefert eine Liste der Länder, die aus der Kategorie extrahiert werden.
+        // Wenn die Liste mehr als 1 Element enthält, also neben "Alle" mindestens ein konkretes Land vorhanden ist,
+        // soll der Picker angezeigt werden.
+        return manager.getAvailableCountries(for: category).count > 1
+    }
 
     var body: some View {
         NavigationStack {
@@ -75,16 +83,19 @@ struct StationsView: View {
                         Label("Abc", systemImage: manager.alphabetical ? "textformat.abc" : "textformat.abc")
                     }
                 }
-                ToolbarItem(placement: .topBarTrailing) {
-                    Menu {
-                        Picker("Land", selection: $manager.selectedCountry) {
-                            Text("Alle").tag("Alle")
-                            ForEach(manager.getAvailableCountries(for: category), id: \.self) { country in
-                                Text(country).tag(country)
+                // Picker-ToolbarItem wird nur angefügt, wenn shouldShowCountryPicker true ist.
+                if shouldShowCountryPicker {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Menu {
+                            Picker("Land", selection: $manager.selectedCountry) {
+                                Text("Alle").tag("Alle")
+                                ForEach(manager.getAvailableCountries(for: category), id: \.self) { country in
+                                    Text(country).tag(country)
+                                }
                             }
+                        } label: {
+                            Image(systemName: "slider.horizontal.3")
                         }
-                    } label: {
-                        Image(systemName: "slider.horizontal.3")
                     }
                 }
             }
@@ -120,14 +131,15 @@ struct StationsView: View {
 
     /// Aktualisiert die gefilterte Liste für die aktuell ausgewählte Kategorie
     private func updateFilteredStations() {
-        DispatchQueue.main.async {
-            if category == .favorites {
-                manager.filterByFavoriteStations()
-            } else {
-                let filtered = manager.applyFilters(to: category)
-                manager.filteredStationsByCategory[category] = filtered
-                print("`filteredStations` für \(category.displayName) aktualisiert: \(filtered.count) Sender")
-            }
+        if category == .favorites {
+            manager.filterByFavoriteStations()
+            let filtered = manager.applyFilters(to: .favorites)
+            manager.filteredStationsByCategory[.favorites] = filtered
+            print("Favoriten aktualisiert: \(filtered.count) Sender")
+        } else {
+            let filtered = manager.applyFilters(to: category)
+            manager.filteredStationsByCategory[category] = filtered
+            print("`filteredStations` für \(category.displayName) aktualisiert: \(filtered.count) Sender")
         }
     }
 

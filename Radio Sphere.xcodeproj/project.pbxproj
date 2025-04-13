@@ -30,8 +30,8 @@
 
 /* Begin PBXFileReference section */
 		81A791D72D68853900004664 /* Radio Sphere.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Radio Sphere.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		81A791E72D68853B00004664 /* Radio_SphereTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Radio_SphereTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		81A791F12D68853B00004664 /* Radio_SphereUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Radio_SphereUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		81A791E72D68853B00004664 /* Radio SphereTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Radio SphereTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		81A791F12D68853B00004664 /* Radio SphereUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Radio SphereUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		81B771B02DA6B6D90091B342 /* Property List.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Property List.plist"; sourceTree = "<group>"; };
 		81B9D7812DA6BFC600081A58 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -96,8 +96,8 @@
 			isa = PBXGroup;
 			children = (
 				81A791D72D68853900004664 /* Radio Sphere.app */,
-				81A791E72D68853B00004664 /* Radio_SphereTests.xctest */,
-				81A791F12D68853B00004664 /* Radio_SphereUITests.xctest */,
+				81A791E72D68853B00004664 /* Radio SphereTests.xctest */,
+				81A791F12D68853B00004664 /* Radio SphereUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -105,9 +105,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		81A791D62D68853900004664 /* Radio_Sphere */ = {
+		81A791D62D68853900004664 /* Radio Sphere */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 81A791FB2D68853B00004664 /* Build configuration list for PBXNativeTarget "Radio_Sphere" */;
+			buildConfigurationList = 81A791FB2D68853B00004664 /* Build configuration list for PBXNativeTarget "Radio Sphere" */;
 			buildPhases = (
 				81A791D32D68853900004664 /* Sources */,
 				81A791D42D68853900004664 /* Frameworks */,
@@ -120,7 +120,7 @@
 			fileSystemSynchronizedGroups = (
 				81A791D92D68853900004664 /* Radio_Sphere */,
 			);
-			name = Radio_Sphere;
+			name = "Radio Sphere";
 			packageProductDependencies = (
 				81A792092D68857D00004664 /* FRadioPlayer */,
 			);
@@ -128,9 +128,9 @@
 			productReference = 81A791D72D68853900004664 /* Radio Sphere.app */;
 			productType = "com.apple.product-type.application";
 		};
-		81A791E62D68853B00004664 /* Radio_SphereTests */ = {
+		81A791E62D68853B00004664 /* Radio SphereTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 81A791FE2D68853B00004664 /* Build configuration list for PBXNativeTarget "Radio_SphereTests" */;
+			buildConfigurationList = 81A791FE2D68853B00004664 /* Build configuration list for PBXNativeTarget "Radio SphereTests" */;
 			buildPhases = (
 				81A791E32D68853B00004664 /* Sources */,
 				81A791E42D68853B00004664 /* Frameworks */,
@@ -144,16 +144,16 @@
 			fileSystemSynchronizedGroups = (
 				81A791EA2D68853B00004664 /* Radio_SphereTests */,
 			);
-			name = Radio_SphereTests;
+			name = "Radio SphereTests";
 			packageProductDependencies = (
 			);
 			productName = Radio_SphereTests;
-			productReference = 81A791E72D68853B00004664 /* Radio_SphereTests.xctest */;
+			productReference = 81A791E72D68853B00004664 /* Radio SphereTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		81A791F02D68853B00004664 /* Radio_SphereUITests */ = {
+		81A791F02D68853B00004664 /* Radio SphereUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 81A792012D68853B00004664 /* Build configuration list for PBXNativeTarget "Radio_SphereUITests" */;
+			buildConfigurationList = 81A792012D68853B00004664 /* Build configuration list for PBXNativeTarget "Radio SphereUITests" */;
 			buildPhases = (
 				81A791ED2D68853B00004664 /* Sources */,
 				81A791EE2D68853B00004664 /* Frameworks */,
@@ -167,11 +167,11 @@
 			fileSystemSynchronizedGroups = (
 				81A791F42D68853B00004664 /* Radio_SphereUITests */,
 			);
-			name = Radio_SphereUITests;
+			name = "Radio SphereUITests";
 			packageProductDependencies = (
 			);
 			productName = Radio_SphereUITests;
-			productReference = 81A791F12D68853B00004664 /* Radio_SphereUITests.xctest */;
+			productReference = 81A791F12D68853B00004664 /* Radio SphereUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -197,7 +197,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 81A791D22D68853900004664 /* Build configuration list for PBXProject "Radio_Sphere" */;
+			buildConfigurationList = 81A791D22D68853900004664 /* Build configuration list for PBXProject "Radio Sphere" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -215,9 +215,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				81A791D62D68853900004664 /* Radio_Sphere */,
-				81A791E62D68853B00004664 /* Radio_SphereTests */,
-				81A791F02D68853B00004664 /* Radio_SphereUITests */,
+				81A791D62D68853900004664 /* Radio Sphere */,
+				81A791E62D68853B00004664 /* Radio SphereTests */,
+				81A791F02D68853B00004664 /* Radio SphereUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -274,12 +274,12 @@
 /* Begin PBXTargetDependency section */
 		81A791E92D68853B00004664 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 81A791D62D68853900004664 /* Radio_Sphere */;
+			target = 81A791D62D68853900004664 /* Radio Sphere */;
 			targetProxy = 81A791E82D68853B00004664 /* PBXContainerItemProxy */;
 		};
 		81A791F32D68853B00004664 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 81A791D62D68853900004664 /* Radio_Sphere */;
+			target = 81A791D62D68853900004664 /* Radio Sphere */;
 			targetProxy = 81A791F22D68853B00004664 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -485,7 +485,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Radio_Sphere.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Radio_Sphere";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Radio Sphere.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Radio Sphere";
 			};
 			name = Debug;
 		};
@@ -504,7 +504,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Radio_Sphere.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Radio_Sphere";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Radio Sphere.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Radio Sphere";
 			};
 			name = Release;
 		};
@@ -545,7 +545,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		81A791D22D68853900004664 /* Build configuration list for PBXProject "Radio_Sphere" */ = {
+		81A791D22D68853900004664 /* Build configuration list for PBXProject "Radio Sphere" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				81A791F92D68853B00004664 /* Debug */,
@@ -554,7 +554,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		81A791FB2D68853B00004664 /* Build configuration list for PBXNativeTarget "Radio_Sphere" */ = {
+		81A791FB2D68853B00004664 /* Build configuration list for PBXNativeTarget "Radio Sphere" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				81A791FC2D68853B00004664 /* Debug */,
@@ -563,7 +563,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		81A791FE2D68853B00004664 /* Build configuration list for PBXNativeTarget "Radio_SphereTests" */ = {
+		81A791FE2D68853B00004664 /* Build configuration list for PBXNativeTarget "Radio SphereTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				81A791FF2D68853B00004664 /* Debug */,
@@ -572,7 +572,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		81A792012D68853B00004664 /* Build configuration list for PBXNativeTarget "Radio_SphereUITests" */ = {
+		81A792012D68853B00004664 /* Build configuration list for PBXNativeTarget "Radio SphereUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				81A792022D68853B00004664 /* Debug */,

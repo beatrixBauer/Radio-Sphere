@@ -16,9 +16,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "81A791D62D68853900004664"
-               BuildableName = "Radio_Sphere.app"
-               BlueprintName = "Radio_Sphere"
-               ReferencedContainer = "container:Radio_Sphere.xcodeproj">
+               BuildableName = "Radio Sphere.app"
+               BlueprintName = "Radio Sphere"
+               ReferencedContainer = "container:Radio Sphere.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -36,9 +36,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "81A791E62D68853B00004664"
-               BuildableName = "Radio_SphereTests.xctest"
-               BlueprintName = "Radio_SphereTests"
-               ReferencedContainer = "container:Radio_Sphere.xcodeproj">
+               BuildableName = "Radio SphereTests.xctest"
+               BlueprintName = "Radio SphereTests"
+               ReferencedContainer = "container:Radio Sphere.xcodeproj">
             </BuildableReference>
          </TestableReference>
          <TestableReference
@@ -47,9 +47,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "81A791F02D68853B00004664"
-               BuildableName = "Radio_SphereUITests.xctest"
-               BlueprintName = "Radio_SphereUITests"
-               ReferencedContainer = "container:Radio_Sphere.xcodeproj">
+               BuildableName = "Radio SphereUITests.xctest"
+               BlueprintName = "Radio SphereUITests"
+               ReferencedContainer = "container:Radio Sphere.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -69,9 +69,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "81A791D62D68853900004664"
-            BuildableName = "Radio_Sphere.app"
-            BlueprintName = "Radio_Sphere"
-            ReferencedContainer = "container:Radio_Sphere.xcodeproj">
+            BuildableName = "Radio Sphere.app"
+            BlueprintName = "Radio Sphere"
+            ReferencedContainer = "container:Radio Sphere.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -86,9 +86,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "81A791D62D68853900004664"
-            BuildableName = "Radio_Sphere.app"
-            BlueprintName = "Radio_Sphere"
-            ReferencedContainer = "container:Radio_Sphere.xcodeproj">
+            BuildableName = "Radio Sphere.app"
+            BlueprintName = "Radio Sphere"
+            ReferencedContainer = "container:Radio Sphere.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

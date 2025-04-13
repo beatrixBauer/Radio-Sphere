@@ -144,7 +144,7 @@ class StationsManager: ObservableObject, FRadioPlayerDelegate {
         filtersWereReset = false
     }
 
-    // MARK: Startet die API-Abfrage nach Kategoie und händelt den lokale Filterung
+    // MARK: Filtert nach Kategoie und händelt den lokale Filterung
     /// Wendet die lokalen Filter auf die Senderliste an
     func applyFilters(to category: RadioCategory) -> [RadioStation] {
         var results = getStations(for: category)
@@ -358,11 +358,10 @@ class StationsManager: ObservableObject, FRadioPlayerDelegate {
             filteredStations.first(where: { $0.id.lowercased() == id.lowercased() })
         }
 
-        DispatchQueue.main.async {
-            self.stationsByCategory[category] = sortedStations
-            self.filteredStationsByCategory[category] = sortedStations
-            print("\(category.rawValue.capitalized) geladen: \(sortedStations.count) Sender")
-        }
+        // Aktualisiere synchron beide Dictionaries
+        self.stationsByCategory[category] = sortedStations
+        self.filteredStationsByCategory[category] = self.applyFilters(to: category)
+        print("\(category.rawValue.capitalized) geladen: \(sortedStations.count) Sender")
     }
 
     /// Filtert Sender mit doppelten Namen heraus (basierend auf decodedName)
@@ -382,55 +381,62 @@ class StationsManager: ObservableObject, FRadioPlayerDelegate {
     /// Sucht lokale Sender und sortiert sie nach Distanz
     func fetchLocalStations() {
         let locationManager = LocationManager.shared
-
-        // Hole Standortinformationen, mit Fallbacks, falls nichts vorhanden ist
-        _ = locationManager.countryCode ?? Locale.current.region?.identifier ?? "DE"
-        let state = locationManager.state ?? ""
-        // let lat = locationManager.currentLocation?.coordinate.latitude ?? 0.0
-        // let lon = locationManager.currentLocation?.coordinate.longitude ?? 0.0
-
-        // Nutze die globalen Sender aus allStations
         let allStationsGlobal = self.allStations
-
-        // 1. Filtere Sender, die innerhalb eines Radius (hier 50 km) liegen
-        let stationsByProximity = locationManager.filterStationsByProximity(allStationsGlobal, maxDistance: 50000.0)
-        print("Sender im Umkreis von 50 km: \(stationsByProximity.count)")
-
-        // 2. Filtere zusätzlich nach Bundesland, falls vorhanden
-        let stationsByState: [RadioStation] = state.isEmpty ? [] : allStationsGlobal.filter { station in
-            guard let stationState = station.state?.lowercased() else { return false }
-            return stationState == state.lowercased()
-        }
-        print("Sender basierend auf dem Bundesland: \(stationsByState.count)")
-
-        // 3. Kombiniere beide Filter-Ergebnisse und entferne Duplikate
-        let combinedStations = stationsByProximity + stationsByState
-        let uniqueStations = Array(Dictionary(combinedStations.map { ($0.id, $0) },
-                                              uniquingKeysWith: { first, _ in first }).values)
-
-        // 4. Falls nach diesen Filtern keine Sender gefunden werden, verwende als Fallback alle deutschen Sender aus allStations
-        let finalStations: [RadioStation]
-        if uniqueStations.isEmpty {
-            finalStations = allStationsGlobal.filter { station in
-                station.country.lowercased() == "de"
+        // Hole den Fallback-Ländercode aus der Locale – standardmäßig „de“
+        let fallbackCountry = (Locale.current.region?.identifier ?? "de").lowercased()
+        
+        // Prüfe, ob ein aktueller Standort vorliegt:
+        if let _ = locationManager.currentLocation {
+            // Standort wurde ermittelt – normale Filterung
+            let stationsByProximity = locationManager.filterStationsByProximity(allStationsGlobal, maxDistance: 50000.0)
+            print("Sender im Umkreis von 50 km: \(stationsByProximity.count)")
+            
+            // Versuche, Sender anhand des Bundeslandes zu filtern (falls vorhanden)
+            let stationsByState: [RadioStation] = {
+                if let state = locationManager.state, !state.isEmpty {
+                    return allStationsGlobal.filter { station in
+                        guard let stationState = station.state?.lowercased() else { return false }
+                        return stationState == state.lowercased()
+                    }
+                }
+                return []
+            }()
+            print("Sender basierend auf dem Bundesland: \(stationsByState.count)")
+            
+            // Kombiniere beide Filter-Ergebnisse
+            let combinedStations = stationsByProximity + stationsByState
+            let uniqueStations = Array(Dictionary(combinedStations.map { ($0.id, $0) },
+                                                  uniquingKeysWith: { first, _ in first }).values)
+            
+            // Falls keine Sender durch Proximity oder State gefunden wurden, als Fallback Sender mit country = fallbackCountry verwenden
+            let finalStations: [RadioStation] = uniqueStations.isEmpty
+                ? allStationsGlobal.filter { $0.country.lowercased() == fallbackCountry }
+                : uniqueStations
+            
+            // Sortiere die Sender nach Distanz (falls der Standort verfügbar ist)
+            let sortedStations = finalStations.sorted { first, second in
+                let distanceA = locationManager.getDistanceToStation(station: first) ?? Double.infinity
+                let distanceB = locationManager.getDistanceToStation(station: second) ?? Double.infinity
+                return distanceA < distanceB
             }
-            print("Fallback aktiviert – keine lokalen Sender gefunden, gefiltert: \(finalStations.count) deutsche Sender")
+            
+            DispatchQueue.main.async {
+                self.stationsByCategory[.local] = sortedStations
+                print("Kombinierte lokale Sender geladen: \(sortedStations.count) Sender")
+            }
+            
         } else {
-            finalStations = uniqueStations
-        }
-
-        // 5. Sortiere die finalen Sender basierend auf der Entfernung zum aktuellen Standort
-        let sortedStations = finalStations.sorted { first, second in
-            let firstDistance = locationManager.getDistanceToStation(station: first) ?? Double.infinity
-            let secondDistance = locationManager.getDistanceToStation(station: second) ?? Double.infinity
-            return firstDistance < secondDistance
-        }
-
-        DispatchQueue.main.async {
-            self.stationsByCategory[.local] = sortedStations
-            print("Kombinierte lokale Sender geladen: \(sortedStations.count) Sender")
+            // Es wurde keine Standortberechtigung erteilt – daher einfach nach countrycode filtern
+            let filteredByCountry = allStationsGlobal.filter { station in
+                station.countrycode.lowercased() == fallbackCountry
+            }
+            DispatchQueue.main.async {
+                self.stationsByCategory[.local] = filteredByCountry
+                print("Lokale Sender (ohne Standort): \(filteredByCountry.count) Sender")
+            }
         }
     }
+
 
     /// Ermittelt aus einer angezeigten Liste mit Radiostationen die verschiedenen Länder für die Filterung nach Land
     func getAvailableCountries(for category: RadioCategory) -> [String] {

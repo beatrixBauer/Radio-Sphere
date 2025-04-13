@@ -48,7 +48,7 @@ struct PlayerView: View {
                     // Sendername: Schriftgröße wird dynamisch gewählt
                     MarqueeText(text: station.decodedName,
                                 font: isCompact ? .headline : .title,
-                                speed: 4, delay: 1)
+                                speed: 5, delay: 1)
                         .frame(maxWidth: .infinity)
                         .padding(.horizontal, 20)
 
@@ -88,20 +88,20 @@ struct PlayerView: View {
 
                 // Künstler und aktueller Song: Schriftgröße wird angepasst
                 Text(manager.currentArtist.fixEncoding())
-                    .font(isCompact ? .headline : .title2)
+                    .font(isCompact ? .title : .title2)
                     .fontWeight(.semibold)
                     .lineLimit(1)
                     .truncationMode(.tail)
 
                 Text(manager.currentTrack.fixEncoding())
-                    .font(isCompact ? .headline : .title2)
+                    .font(isCompact ? .title : .title2)
                     .fontWeight(.semibold)
                     .lineLimit(1)
                     .truncationMode(.tail)
 
                 HStack(spacing: isCompact ? 30 : 50) {
                     // Previous-Button mit angepasster Größe
-                    ActionButton(systemName: "backward.fill", buttonSize: isCompact ? 20 : 30) {
+                    ActionButton(systemName: "backward.fill", buttonSize: isCompact ? 25 : 28) {
                         manager.setPrevious()
                     }
 
@@ -115,22 +115,22 @@ struct PlayerView: View {
                     } label: {
                         Image(systemName: manager.isPlaying && manager.currentStation == station ? "pause.circle.fill" : "play.circle.fill")
                             .resizable()
-                            .frame(width: isCompact ? 40 : 50, height: isCompact ? 40 : 50)
+                            .frame(width: isCompact ? 30 : 40, height: isCompact ? 30 : 40)
                             .foregroundColor(manager.isPlaying && manager.currentStation?.id == station.id ? Color("goldorange") : .gray)
                             .shadow(radius: 4)
                     }
 
                     // Next-Button mit angepasster Größe
-                    ActionButton(systemName: "forward.fill", buttonSize: isCompact ? 20 : 30) {
+                    ActionButton(systemName: "forward.fill", buttonSize: isCompact ? 25 : 28) {
                         manager.setNext()
                     }
                 }
                 .padding(.vertical, isCompact ? 10 : 20)
 
                 HStack {
-                    SleepTimerView(iconSize: isCompact ? 25 : 30)
+                    SleepTimerView(iconSize: isCompact ? 25 : 28)
                     Spacer()
-                    LikeButton(station: station, buttonSize: isCompact ? 25 : 30)
+                    LikeButton(station: station, buttonSize: isCompact ? 25 : 28)
                         .frame(maxWidth: .infinity, alignment: .trailing)
                 }
                 .padding(.horizontal, isCompact ? 30 : 40)

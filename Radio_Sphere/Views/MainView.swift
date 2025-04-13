@@ -43,7 +43,7 @@ struct MainView: View {
 
                 StationsView(category: RadioCategory.favorites)
                     .tabItem {
-                        Image(selectedTab == 2 ? "starFill" : "starEmpty")
+                        Image(selectedTab == 2 ? "heartSquareFill" : "heartSquare")
                         Text("Favoriten")
                     }
                     .tag(2)
