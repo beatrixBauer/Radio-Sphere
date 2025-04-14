@@ -28,7 +28,7 @@ struct PlayerView: View {
     var body: some View {
 
         GeometryReader { geometry in
-            let isCompact = geometry.size.height < 650
+            let isCompact = geometry.size.height < 800
             VStack {
                 if isSheet {
                     HStack {
@@ -48,9 +48,9 @@ struct PlayerView: View {
                     // Sendername: Schriftgröße wird dynamisch gewählt
                     MarqueeText(text: station.decodedName,
                                 font: isCompact ? .headline : .title,
-                                speed: 5, delay: 1)
+                                speed: 40)
                         .frame(maxWidth: .infinity)
-                        .padding(.horizontal, 20)
+                        .padding(.trailing, 20)
 
                     Spacer()
 

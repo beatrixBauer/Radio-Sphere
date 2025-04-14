@@ -305,23 +305,58 @@ class StationsManager: ObservableObject, FRadioPlayerDelegate {
             completion()
             return
         }
-
+        
         let queryLower = globalSearchText.lowercased()
-
+        
         // Suche nach Sendernamen und Tags (Genre)
         let results = allStations.filter { station in
-            // Hier gehen wir davon aus, dass station.decodedName und station.decodedTags
-            // die gewünschten Informationen enthalten.
             return station.decodedName.lowercased().contains(queryLower) ||
                    (station.decodedTags?.lowercased().contains(queryLower) ?? false)
         }
-
+        
         let uniqueStations = filterUniqueStationsByName(results)
-
+        
+        // Sortiere die Treffer nach Score (bessere Übereinstimmung zuerst) und danach alphabetisch
+        let sortedStations = uniqueStations.sorted { station1, station2 in
+            let score1 = matchScore(for: station1, query: queryLower)
+            let score2 = matchScore(for: station2, query: queryLower)
+            if score1 == score2 {
+                return station1.decodedName.localizedCaseInsensitiveCompare(station2.decodedName) == .orderedAscending
+            }
+            return score1 < score2
+        }
+        
         DispatchQueue.main.async {
-            self.searchedStations = uniqueStations
-            self.currentSearchResults = uniqueStations
+            self.searchedStations = sortedStations
+            self.currentSearchResults = sortedStations
             completion()
+        }
+    }
+    
+    // Eine Hilfsfunktion, die für einen RadioStation-Objekt einen Such-Score berechnet.
+    private func matchScore(for station: RadioStation, query: String) -> Int {
+        let name = station.decodedName.lowercased()
+        let tags = station.decodedTags?.lowercased() ?? ""
+        
+        // Exakter Volltreffer im Namen
+        if name == query {
+            return 0
+        }
+        // Name beginnt mit dem Suchtext
+        else if name.hasPrefix(query) {
+            return 1
+        }
+        // Name enthält den Suchtext
+        else if name.contains(query) {
+            return 2
+        }
+        // Falls die Tags den Suchtext enthalten, gib einen etwas höheren Score zurück
+        else if tags.contains(query) {
+            return 3
+        }
+        // Kein Treffer (sollte in der Filterung nicht vorkommen, da wir nur passende Sender haben)
+        else {
+            return 4
         }
     }
 
@@ -441,7 +476,8 @@ class StationsManager: ObservableObject, FRadioPlayerDelegate {
     /// Ermittelt aus einer angezeigten Liste mit Radiostationen die verschiedenen Länder für die Filterung nach Land
     func getAvailableCountries(for category: RadioCategory) -> [String] {
         let stations = getStations(for: category)
-        let countries = stations.map { $0.decodedCountry }
+        // greift auf den CountryPickerHelper zu um lange Ländernamen zu kürzen
+        let countries = stations.map { CountryPickerHelper.displayName(for: $0.decodedCountry) }
         return Array(Set(countries)).sorted()
     }
 
