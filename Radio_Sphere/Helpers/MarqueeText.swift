@@ -12,9 +12,9 @@ import SwiftUI
 struct MarqueeText: View {
     let text: String
     let font: Font
-    let speed: Double      // Geschwindigkeit in Punkte pro Sekunde, z. B. 30.0
+    let speed: Double      // Geschwindigkeit in der der Text durchläuft
     let delimiter = "·"
-    let repeatCount = 10   
+    let repeatCount = 10
 
     @State private var offset: CGFloat = 0
 
@@ -56,7 +56,6 @@ struct MarqueeText: View {
     }
     
     private func fontSize(for font: Font) -> CGFloat {
-        // Hier kannst du eine Umrechnung vornehmen oder einen Standardwert festlegen.
         return 20
     }
 }

@@ -47,7 +47,7 @@ struct PlayerView: View {
                 HStack {
                     // Sendername: Schriftgröße wird dynamisch gewählt
                     MarqueeText(text: station.decodedName,
-                                font: isCompact ? .headline : .title,
+                                font: isCompact ? .title2 : .title3,
                                 speed: 40)
                         .frame(maxWidth: .infinity)
                         .padding(.trailing, 20)
@@ -88,13 +88,13 @@ struct PlayerView: View {
 
                 // Künstler und aktueller Song: Schriftgröße wird angepasst
                 Text(manager.currentArtist.fixEncoding())
-                    .font(isCompact ? .title : .title2)
+                    .font(isCompact ? .title3 : .body)
                     .fontWeight(.semibold)
                     .lineLimit(1)
                     .truncationMode(.tail)
 
                 Text(manager.currentTrack.fixEncoding())
-                    .font(isCompact ? .title : .title2)
+                    .font(isCompact ? .title3 : .body)
                     .fontWeight(.semibold)
                     .lineLimit(1)
                     .truncationMode(.tail)
@@ -115,7 +115,7 @@ struct PlayerView: View {
                     } label: {
                         Image(systemName: manager.isPlaying && manager.currentStation == station ? "pause.circle.fill" : "play.circle.fill")
                             .resizable()
-                            .frame(width: isCompact ? 30 : 40, height: isCompact ? 30 : 40)
+                            .frame(width: isCompact ? 35 : 40, height: isCompact ? 35 : 40)
                             .foregroundColor(manager.isPlaying && manager.currentStation?.id == station.id ? Color("goldorange") : .gray)
                             .shadow(radius: 4)
                     }
@@ -128,12 +128,12 @@ struct PlayerView: View {
                 .padding(.vertical, isCompact ? 10 : 20)
 
                 HStack {
-                    SleepTimerView(iconSize: isCompact ? 25 : 28)
+                    SleepTimerView(iconSize: isCompact ? 23 : 28)
                     Spacer()
-                    LikeButton(station: station, buttonSize: isCompact ? 25 : 28)
+                    LikeButton(station: station, buttonSize: isCompact ? 23 : 28)
                         .frame(maxWidth: .infinity, alignment: .trailing)
                 }
-                .padding(.horizontal, isCompact ? 30 : 40)
+                .padding(.horizontal, 40)
             }
             .frame(maxHeight: .infinity, alignment: .center)
             .padding(.horizontal, 10)
