@@ -37,7 +37,7 @@ struct MainView: View {
                 SearchView()
                     .tabItem {
                         Image(selectedTab == 1 ? "searchSparkle" : "searchEmpty")
-                        Text("Search")
+                        Text("Suche")
                     }
                     .tag(1)
 

@@ -16,23 +16,42 @@ class DataManager {
     /// b) Falls der Remote-Call fehlschlägt, wird versucht, die zuletzt gespeicherte Version aus dem Documents-Verzeichnis zu laden (FileManager)
     /// c) Ist keine lokale Version vorhanden, wird der Fallback aus dem Bundle genutzt (Ressourcen).
     func getAllStations(completion: @escaping ([RadioStation]) -> Void) {
-        // Unterscheide anhand des Verbindungstyps
+        let fileManager = FileManager.default
+        // Hole die URL im Documents-Verzeichnis
+        let docsURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        let fileURL = docsURL.appendingPathComponent("stations.json")
+        
+        // Überprüfe, ob die Datei existiert und nicht älter als 24 Stunden ist.
+        if fileManager.fileExists(atPath: fileURL.path),
+           let attributes = try? fileManager.attributesOfItem(atPath: fileURL.path),
+           let modDate = attributes[.modificationDate] as? Date,
+           Date().timeIntervalSince(modDate) < 24 * 60 * 60 {
+            // Es wird ausschließlich die im Documents-Verzeichnis abgelegte Datei verwendet.
+            print("Verwende Sicherheitskopie aus dem Dokumentensystem, da sie nicht älter als 24 Stunden ist.")
+            let localStations = loadStationsFromDocuments()
+            if !localStations.isEmpty {
+                completion(localStations)
+                return
+            }
+        }
+        
+        // Wenn keine frische Datei im Documents-Verzeichnis vorhanden ist, wird die API-Anfrage ausgelöst.
         if NetworkMonitor.shared.connectionType == .cellular {
-            // Bei Mobilfunk: erste 1000 Sender abrufen
+            // Bei Mobilfunk: erste 1000 Sender abrufen.
             api.fetchStations(offset: 0, limit: 1000) { [weak self] initialStations in
                 guard let self = self else { return }
                 if !initialStations.isEmpty {
                     self.saveStationsToDocuments(stations: initialStations)
                     completion(initialStations)
-                    // Starte im Hintergrund die paginierte Abfrage
+                    // Starte im Hintergrund die paginierte Abfrage.
                     self.fetchAllStationsPaginated(startingFrom: 1000)
                 } else {
-                    // Remote-Call schlug fehl – lade aus dem Documents-Verzeichnis
+                    // API-Anfrage schlug fehl, versuche aus dem Documents-Verzeichnis zu laden.
                     let localStations = self.loadStationsFromDocuments()
                     if !localStations.isEmpty {
                         completion(localStations)
                     } else {
-                        // Fallback: stations.json aus dem Bundle kopieren und erneut laden
+                        // Fallback: stations.json aus dem Bundle kopieren und erneut laden.
                         self.copyStationsFromBundleToDocuments()
                         let fallbackStations = self.loadStationsFromDocuments()
                         completion(fallbackStations)
@@ -40,7 +59,7 @@ class DataManager {
                 }
             }
         } else {
-            // Bei WLAN: vollständige Abfrage
+            // Bei WLAN: vollständige Abfrage.
             api.fetchAllStations { [weak self] remoteStations in
                 guard let self = self else { return }
                 if !remoteStations.isEmpty {
@@ -136,3 +155,49 @@ class DataManager {
         }
     }
 }
+
+
+/*func getAllStations(completion: @escaping ([RadioStation]) -> Void) {
+     // Unterscheide anhand des Verbindungstyps
+     if NetworkMonitor.shared.connectionType == .cellular {
+         // Bei Mobilfunk: erste 1000 Sender abrufen
+         api.fetchStations(offset: 0, limit: 1000) { [weak self] initialStations in
+             guard let self = self else { return }
+             if !initialStations.isEmpty {
+                 self.saveStationsToDocuments(stations: initialStations)
+                 completion(initialStations)
+                 // Starte im Hintergrund die paginierte Abfrage
+                 self.fetchAllStationsPaginated(startingFrom: 1000)
+             } else {
+                 // Remote-Call schlug fehl – lade aus dem Documents-Verzeichnis
+                 let localStations = self.loadStationsFromDocuments()
+                 if !localStations.isEmpty {
+                     completion(localStations)
+                 } else {
+                     // Fallback: stations.json aus dem Bundle kopieren und erneut laden
+                     self.copyStationsFromBundleToDocuments()
+                     let fallbackStations = self.loadStationsFromDocuments()
+                     completion(fallbackStations)
+                 }
+             }
+         }
+     } else {
+         // Bei WLAN: vollständige Abfrage
+         api.fetchAllStations { [weak self] remoteStations in
+             guard let self = self else { return }
+             if !remoteStations.isEmpty {
+                 self.saveStationsToDocuments(stations: remoteStations)
+                 completion(remoteStations)
+             } else {
+                 let localStations = self.loadStationsFromDocuments()
+                 if !localStations.isEmpty {
+                     completion(localStations)
+                 } else {
+                     self.copyStationsFromBundleToDocuments()
+                     let fallbackStations = self.loadStationsFromDocuments()
+                     completion(fallbackStations)
+                 }
+             }
+         }
+     }
+ }*/

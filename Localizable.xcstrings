@@ -616,23 +616,6 @@
         }
       }
     },
-    "Search" : {
-      "comment" : "Suche",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Suchen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Search"
-          }
-        }
-      }
-    },
     "Sender suchen" : {
       "comment" : "Sender suchen",
       "localizations" : {
