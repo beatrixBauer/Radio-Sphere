@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "%@" : {
+
+    },
     "%lld Minuten" : {
       "comment" : "Timer Minuten Anzeige",
       "localizations" : {

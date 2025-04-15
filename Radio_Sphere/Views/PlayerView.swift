@@ -129,6 +129,13 @@ struct PlayerView: View {
 
                 HStack {
                     SleepTimerView(iconSize: isCompact ? 23 : 28)
+                    // Hier wird der Countdown des Sleep-Timers angezeigt, sofern aktiv
+                    if manager.isSleepTimerActive, let remaining = manager.sleepTimerRemainingTime {
+                        Text("\(formatTime(remaining))")
+                            .font(isCompact ? .caption : .subheadline)
+                            .foregroundColor(.white)
+                            .padding(.top, 5)
+                    }
                     Spacer()
                     LikeButton(station: station, buttonSize: isCompact ? 23 : 28)
                         .frame(maxWidth: .infinity, alignment: .trailing)
@@ -154,5 +161,12 @@ struct PlayerView: View {
                 }
             }
         }
+    }
+    
+    // Hilfsfunktion zur Formatierung von Sekunden in mm:ss
+    private func formatTime(_ seconds: Int) -> String {
+        let minutes = seconds / 60
+        let secs = seconds % 60
+        return String(format: "%02d:%02d", minutes, secs)
     }
 }

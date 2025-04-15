@@ -62,6 +62,8 @@ class StationsManager: ObservableObject, FRadioPlayerDelegate {
     @Published var alphabetical: Bool = false
     @Published var selectedCountry: String = "Alle"
     @Published var isPlaying = false
+    
+    @Published var sleepTimerRemainingTime: Int? = nil
 
     private let player = FRadioPlayer.shared
    // private var currentOffset = 0

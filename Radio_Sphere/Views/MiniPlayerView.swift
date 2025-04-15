@@ -10,6 +10,7 @@ import SwiftUI
 struct MiniPlayerView: View {
     @ObservedObject var manager = StationsManager.shared
     var onTap: () -> Void
+    @State private var showRemainingTime = false
 
     var body: some View {
         if manager.isPlaying, !manager.isInPlayerView, let station = manager.currentStation {
@@ -35,8 +36,40 @@ struct MiniPlayerView: View {
                         .lineLimit(1)
                 }
                 .padding(.leading, 8)
-
+                
                 Spacer()
+
+                // Sleep Timer Icon mit temporärer Anzeige des Countdowns
+                 if manager.isSleepTimerActive {
+                     Button(action: {
+                         withAnimation {
+                             showRemainingTime.toggle()
+                         }
+                         // Blende den Countdown nach 3 Sekunden automatisch wieder aus:
+                         DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                             withAnimation {
+                                 showRemainingTime = false
+                             }
+                         }
+                     }) {
+                         ZStack {
+                             Image(systemName: "timer.circle.fill")
+                                 .resizable()
+                                 .frame(width: 23, height: 23)
+                                 .foregroundColor(.goldorange)
+                             if showRemainingTime, let remaining = manager.sleepTimerRemainingTime {
+                                 Text(formatTime(remaining))
+                                     .font(.caption2)
+                                     .foregroundColor(.white)
+                                     .padding(4)
+                                     .background(Color.black.opacity(0.7))
+                                     .clipShape(Capsule())
+                                     .offset(y: -30) // Der Text erscheint oberhalb des Icons
+                             }
+                         }
+                     }
+                     .padding(.trailing, 10)
+                 }
 
                 // Pause-Button
                 Button(action: {
@@ -47,7 +80,7 @@ struct MiniPlayerView: View {
                         .frame(width: 25, height: 25)
                         .foregroundColor(.white)
                 }
-                .padding(.trailing, 10)
+                .padding(.horizontal, 10)
             }
             .padding()
             .background(
@@ -73,4 +106,12 @@ struct MiniPlayerView: View {
             }
         }
     }
+    
+    // Hilfsfunktion zur Formatierung von Sekunden in mm:ss
+    private func formatTime(_ seconds: Int) -> String {
+        let minutes = seconds / 60
+        let secs = seconds % 60
+        return String(format: "%02d:%02d", minutes, secs)
+    }
+    
 }

@@ -29,17 +29,21 @@ struct SleepTimerView: View {
                 stopTimer()
             }
         } label: {
-            Image(systemName: "timer")
-                .resizable()
-                .frame(width: iconSize, height: iconSize)
-                .foregroundColor(manager.isSleepTimerActive ? .goldorange : .gray)
-                .shadow(radius: 4)
-        }
-        .onChange(of: manager.isPlaying) { _ in
-            if !manager.isPlaying {
-                stopTimer()
+            HStack {
+                Image(systemName: manager.isSleepTimerActive ? "timer.circle.fill" : "timer")
+                    .resizable()
+                    .frame(width: iconSize, height: iconSize)
+                    .foregroundColor(manager.isSleepTimerActive ? .goldorange : .gray)
+                    .shadow(radius: 4)
             }
         }
+    }
+
+    // Formatierung von Sekunden in mm:ss
+    private func formatTime(_ seconds: Int) -> String {
+        let minutes = seconds / 60
+        let secs = seconds % 60
+        return String(format: "%02d:%02d", minutes, secs)
     }
 
     private func startTimer(minutes: Int) {
@@ -47,17 +51,18 @@ struct SleepTimerView: View {
         selectedTime = minutes
         remainingTime = minutes * 60
         manager.isSleepTimerActive = true
+        manager.sleepTimerRemainingTime = remainingTime
 
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
             if let timeLeft = remainingTime, timeLeft > 0 {
                 remainingTime = timeLeft - 1
+                manager.sleepTimerRemainingTime = remainingTime
             } else {
                 stopTimer()
                 manager.pausePlayback()
                 print("Sleep-Timer abgelaufen: Musik gestoppt!")
             }
         }
-
         print("Sleep-Timer gesetzt auf \(minutes) Minuten")
     }
 
@@ -67,10 +72,12 @@ struct SleepTimerView: View {
         selectedTime = nil
         remainingTime = nil
         manager.isSleepTimerActive = false
+        manager.sleepTimerRemainingTime = nil
         print("Sleep-Timer gestoppt")
     }
 }
 
-#Preview {
-    SleepTimerView()
-}
+
+
+
+
