@@ -27,7 +27,7 @@ struct ContentView: View {
                     ForEach(categories, id: \.self) { category in
                         NavigationLink(destination: StationsView(category: category)) {
                             CategoryTile(title: category.displayName,
-                                         background: category.backgroundStyle)
+                                         iconName: category.iconName)
                         }
                     }
                 }

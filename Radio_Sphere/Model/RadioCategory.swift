@@ -17,22 +17,24 @@ enum RadioCategory: String, CaseIterable {
     case news = "Nachrichten"
 
     case pop = "Pop"
+    case schlager = "Schlager"
+    case hiphop = "Hip-Hop"
     case rock = "Rock"
+    case electronic = "Elektronische Musik"
+    case dance = "Dance"
+    case chillout = "Chillout"
+    case oldies = "Oldies"
+    case country = "Country"
     case jazz = "Jazz"
     case classical = "Klassik"
-    case dance = "Dance"
-    case oldies = "Oldies"
-    case electronic = "Elektronische Musik"
-    case country = "Country"
     case tradtionalMusic = "Traditionelle Musik"
-    case hiphop = "Hip-Hop"
     case alternative = "Alternative"
     case latin = "Latin"
-    case chillout = "Chillout"
-    case meditation = "Meditation"
+    case afrobeat = "Afrobeat"
     case metal = "Metal"
     case punk = "Punk"
     case party = "Party"
+    case meditation = "Meditation"
     case artistRadio = "Künstler-Radio"
 
     // Anzeigenamen für die Kategorien (NavigationTitle StationsView)
@@ -59,6 +61,8 @@ enum RadioCategory: String, CaseIterable {
         case .chillout: return NSLocalizedString("category_chillout", comment: "Chillout")
         case .meditation: return NSLocalizedString("category_meditation", comment: "Meditation")
         case .party: return NSLocalizedString("category_party", comment: "Party")
+        case .schlager: return NSLocalizedString("category_schlager", comment: "Schlager")
+        case .afrobeat: return NSLocalizedString("category_afrobeat", comment: "Afrobeat")
         case .artistRadio: return NSLocalizedString("category_artist_radio", comment: "Künstler-Radio")
         }
     }
@@ -102,6 +106,10 @@ enum RadioCategory: String, CaseIterable {
             return ["meditation", "healing", "nature"]
         case .party:
             return ["party", "festival"]
+        case .schlager:
+            return ["schlager"]
+        case .afrobeat:
+            return ["afrobeat"]
         case .artistRadio:
             return ["discography"]
         default:
@@ -119,6 +127,37 @@ enum RadioCategory: String, CaseIterable {
     }
 }
 
+extension RadioCategory {
+    var iconName: String {
+        switch self {
+        case .local: return "location"
+        case .news: return "newspaper"
+        case .pop: return "music.note"
+        case .schlager: return "dancer"
+        case .hiphop: return "headphones"
+        case .rock: return "guitars"
+        case .electronic: return "bolt"
+        case .dance: return "waveform"
+        case .chillout: return "moon.stars"
+        case .oldies: return "clock"
+        case .country: return "music.mic"
+        case .jazz: return "sax"
+        case .classical: return "music.quarternote.3"
+        case .tradtionalMusic: return "globe"
+        case .alternative: return "a.circle"
+        case .latin: return "globe.americas"
+        case .afrobeat: return "globe.europe.africa"
+        case .metal: return "metal"
+        case .punk: return "punk"
+        case .party: return "party.popper"
+        case .meditation: return "leaf"
+        case .artistRadio: return "person.wave.2"
+        default: return "music.note" // fallback
+        }
+    }
+}
+
+// aktuell unbenutzt
 extension RadioCategory {
     var backgroundStyle: AnyShapeStyle {
         switch self {
@@ -159,3 +198,6 @@ extension RadioCategory {
         }
     }
 }
+
+
+

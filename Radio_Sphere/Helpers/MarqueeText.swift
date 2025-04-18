@@ -12,37 +12,48 @@ import SwiftUI
 struct MarqueeText: View {
     let text: String
     let font: Font
-    let speed: Double      // Geschwindigkeit in der der Text durchläuft
+    let speed: Double      // Geschwindigkeit des Marquees
+    let delay: Double = 0.0  // Optionale Verzögerung für den Start der Animation
     let delimiter = "·"
-    let repeatCount = 10
+    let repeatCount = 10   // Anzahl Wiederholungen, falls animiert wird
 
     @State private var offset: CGFloat = 0
 
     var body: some View {
         GeometryReader { geometry in
-            // Erstelle den Einzeltext inklusive Delimiter
-            let marqueeText = text + " " + delimiter + " "
-            // Berechne die Breite des Einzeltexts
+            // Mit UIFont lassen sich Textmaße besser berechnen
             let uiFont = UIFont.systemFont(ofSize: fontSize(for: font))
-            let singleTextWidth = self.textWidth(text: marqueeText, font: uiFont)
-            // Gesamtbreite ist der Einzeltext multipliziert mit der Anzahl der Wiederholungen
-            let totalWidth = singleTextWidth * CGFloat(repeatCount)
-            
-            HStack(spacing: 0) {
-                ForEach(0..<repeatCount, id: \.self) { _ in
-                    Text(marqueeText)
+            let containerWidth = geometry.size.width
+            let measuredTextWidth = self.textWidth(text: text, font: uiFont)
+
+            if measuredTextWidth > containerWidth {
+                // Text passt nicht komplett – Marquee-Effekt soll starten.
+                // Erstelle eine wiederholte Zeichenkette: [Text + delimiter]
+                let marqueeText = text + " " + delimiter + " "
+                let repeatedText = String(repeating: marqueeText, count: repeatCount)
+                let totalWidth = self.textWidth(text: repeatedText, font: uiFont)
+                
+                HStack(spacing: 0) {
+                    Text(repeatedText)
                         .font(font)
                         .fixedSize(horizontal: true, vertical: false)
                 }
-            }
-            .offset(x: offset)
-            .onAppear {
-                offset = 0
-                // Berechne die Animationsdauer anhand der Gesamtbreite und der Geschwindigkeit
-                let duration = Double(totalWidth) / speed
-                withAnimation(Animation.linear(duration: duration).repeatForever(autoreverses: false)) {
-                    offset = -totalWidth
+                .offset(x: offset)
+                .onAppear {
+                    offset = 0
+                    let duration = Double(totalWidth) / speed
+                    withAnimation(Animation.linear(duration: duration)
+                                    .repeatForever(autoreverses: false)
+                                    .delay(delay)) {
+                        offset = -totalWidth
+                    }
                 }
+            } else {
+                // Text passt komplett – Animation nicht nötig.
+                Text(text)
+                    .font(font)
+                    .fixedSize(horizontal: true, vertical: false)
+                    .frame(width: containerWidth, alignment: .center)
             }
         }
         .frame(height: 40)
@@ -56,9 +67,11 @@ struct MarqueeText: View {
     }
     
     private func fontSize(for font: Font) -> CGFloat {
+        // Hier kannst du den Fontsize-Wert anpassen, falls nötig.
         return 20
     }
 }
+
 
 
 /*struct MarqueeText: View {

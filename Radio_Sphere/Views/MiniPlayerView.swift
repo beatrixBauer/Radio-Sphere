@@ -58,7 +58,7 @@ struct MiniPlayerView: View {
                                  .frame(width: 23, height: 23)
                                  .foregroundColor(.goldorange)
                              if showRemainingTime, let remaining = manager.sleepTimerRemainingTime {
-                                 Text(formatTime(remaining))
+                                 Text(remaining.asMMSS)
                                      .font(.caption2)
                                      .foregroundColor(.white)
                                      .padding(4)

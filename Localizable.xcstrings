@@ -6,6 +6,7 @@
     },
     "%lld Minuten" : {
       "comment" : "Timer Minuten Anzeige",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -20,6 +21,9 @@
           }
         }
       }
+    },
+    "%lld Minuten" : {
+
     },
     "Abc" : {
       "comment" : "Alphabetisch sortieren",
@@ -51,6 +55,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "All"
+          }
+        }
+      }
+    },
+    "category_afrobeat" : {
+      "comment" : "Afrobeat",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AfroBeat"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AfroBeat"
           }
         }
       }
@@ -412,6 +433,23 @@
         }
       }
     },
+    "category_schlager" : {
+      "comment" : "Schlager",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schlager"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schlager"
+          }
+        }
+      }
+    },
     "category_traditional" : {
       "comment" : "Volksmusik",
       "localizations" : {
@@ -527,6 +565,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Now on iTunes"
+          }
+        }
+      }
+    },
+    "Jetzt läuft..." : {
+      "comment" : "Fallback-Titel, wenn kein Trackname verfügbar ist",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jetzt läuft…"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Now playing…"
           }
         }
       }

@@ -76,12 +76,16 @@ struct StationsView: View {
                     )
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {
-                        manager.alphabetical.toggle()
-                        updateFilteredStations()
-                    }) {
-                        Label("Abc", systemImage: manager.alphabetical ? "textformat.abc" : "textformat.abc")
+                  Button {
+                    manager.sortMode = manager.sortMode.next
+                    updateFilteredStations()
+                  } label: {
+                    HStack(spacing: 4) {
+                        Text("Abc")
+                      Image(systemName: manager.sortMode.iconName)
                     }
+                    .font(.body)
+                  }
                 }
                 // Picker-ToolbarItem wird nur angefügt, wenn shouldShowCountryPicker true ist.
                 if shouldShowCountryPicker {

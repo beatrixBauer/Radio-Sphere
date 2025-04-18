@@ -28,7 +28,7 @@ struct PlayerView: View {
     var body: some View {
 
         GeometryReader { geometry in
-            let isCompact = geometry.size.height < 800
+            let isCompact = geometry.size.height < 700
             VStack {
                 if isSheet {
                     HStack {
@@ -47,7 +47,7 @@ struct PlayerView: View {
                 HStack {
                     // Sendername: Schriftgröße wird dynamisch gewählt
                     MarqueeText(text: station.decodedName,
-                                font: isCompact ? .title2 : .title3,
+                                font: isCompact ? .title : .title2,
                                 speed: 40)
                         .frame(maxWidth: .infinity)
                         .padding(.trailing, 20)
@@ -75,6 +75,16 @@ struct PlayerView: View {
                                      frameWidth: isCompact ? 250 : 300,
                                      frameHeight: isCompact ? 250 : 300)
 
+                    if manager.isBuffering {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                            .scaleEffect(1.2)
+                            // legt Spinner zentriert übers Cover
+                            .frame(width: isCompact ? 250 : 300,
+                                   height: isCompact ? 250 : 300,
+                                   alignment: .center)
+                    }
+                    
                     // Neuen ITunesLinkButton einfügen – vorausgesetzt, du hast bereits die URL (trackViewUrl) ermittelt
                     if let trackUrl = manager.currentTrackURL {
                         ITunesLinkButton(trackUrl: trackUrl)
@@ -87,13 +97,13 @@ struct PlayerView: View {
                 VolumeSliderView()
 
                 // Künstler und aktueller Song: Schriftgröße wird angepasst
-                Text(manager.currentArtist.fixEncoding())
+                Text(manager.currentTrack.fixEncoding())
                     .font(isCompact ? .title3 : .body)
                     .fontWeight(.semibold)
                     .lineLimit(1)
                     .truncationMode(.tail)
-
-                Text(manager.currentTrack.fixEncoding())
+                
+                Text(manager.currentArtist.fixEncoding())
                     .font(isCompact ? .title3 : .body)
                     .fontWeight(.semibold)
                     .lineLimit(1)
@@ -131,7 +141,7 @@ struct PlayerView: View {
                     SleepTimerView(iconSize: isCompact ? 23 : 28)
                     // Hier wird der Countdown des Sleep-Timers angezeigt, sofern aktiv
                     if manager.isSleepTimerActive, let remaining = manager.sleepTimerRemainingTime {
-                        Text("\(formatTime(remaining))")
+                        Text("\(remaining.asMMSS)")
                             .font(isCompact ? .caption : .subheadline)
                             .foregroundColor(.white)
                             .padding(.top, 5)

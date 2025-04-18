@@ -89,6 +89,8 @@ struct MainView: View {
         }
         .onChange(of: selectedTab) { newValue in
             print("Aktiver Tab gewechselt: \(newValue)")
+            manager.allowFilterReset()
+            manager.resetFilters()
         }
         .tint(.white)
         .environment(\.selectedTab, $selectedTab)

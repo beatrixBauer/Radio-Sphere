@@ -17,7 +17,7 @@ class RadioAPI {
     private var baseURL: String {
         return availableBaseURLs.first! + "/json/stations"
     }
-    private var limit = "1000"
+    
     private let userAgent = "Radio Sphere/0.9 (iOS; beatrix.bauer@gmail.com)"
 
     // Initializer mit übergebener URLSession – Standard ist URLSession.shared

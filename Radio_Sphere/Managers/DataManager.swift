@@ -37,14 +37,14 @@ class DataManager {
         
         // Wenn keine frische Datei im Documents-Verzeichnis vorhanden ist, wird die API-Anfrage ausgelöst.
         if NetworkMonitor.shared.connectionType == .cellular {
-            // Bei Mobilfunk: erste 1000 Sender abrufen.
-            api.fetchStations(offset: 0, limit: 1000) { [weak self] initialStations in
+            // Bei Mobilfunk: erste 500 Sender abrufen.
+            api.fetchStations(offset: 0, limit: 500) { [weak self] initialStations in
                 guard let self = self else { return }
                 if !initialStations.isEmpty {
                     self.saveStationsToDocuments(stations: initialStations)
                     completion(initialStations)
                     // Starte im Hintergrund die paginierte Abfrage.
-                    self.fetchAllStationsPaginated(startingFrom: 1000)
+                    self.fetchAllStationsPaginated(startingFrom: 500)
                 } else {
                     // API-Anfrage schlug fehl, versuche aus dem Documents-Verzeichnis zu laden.
                     let localStations = self.loadStationsFromDocuments()
@@ -135,7 +135,7 @@ class DataManager {
     // MARK: Paginierte Abfrage im Hintergrund
     /// Ruft sukzessive weitere Senderseiten ab, beginnt beim angegebenen Offset und fügt sie der lokalen Kopie hinzu.
     private func fetchAllStationsPaginated(startingFrom offset: Int) {
-        let pageLimit = 1000
+        let pageLimit = 500
         api.fetchStations(offset: offset, limit: pageLimit) { [weak self] nextStations in
             guard let self = self else { return }
             if nextStations.isEmpty {
