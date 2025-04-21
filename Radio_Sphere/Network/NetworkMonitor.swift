@@ -8,8 +8,7 @@
 import Network
 import Combine
 
-// Überprüfung der Internetverbindung beim Start der App -> wird von SplashView aufgerufen
-
+/// Überprüfung der Internetverbindung beim Start der App -> wird von SplashView aufgerufen
 class NetworkMonitor: ObservableObject {
     static let shared = NetworkMonitor()
 
@@ -25,17 +24,20 @@ class NetworkMonitor: ObservableObject {
     func startMonitoring() {
         monitor.pathUpdateHandler = { [weak self] path in
             DispatchQueue.main.async {
-                self?.isConnected = path.status == .satisfied
+                // Online/Offline-Status
+                self?.isConnected = (path.status == .satisfied)
 
-                // Bestimme den primären Verbindungstyp
-                if let interface = path.availableInterfaces.first(where: { path.usesInterfaceType($0.type) }) {
-                    self?.connectionType = interface.type
+                // Unterscheide Mobilfunk (teuer) vs. WLAN/Ethernet (günstig)
+                if path.isExpensive {
+                    // teure Verbindung = Mobilfunk (oder Hotspot über Mobilfunk)
+                    self?.connectionType = .cellular
                 } else {
-                    self?.connectionType = nil
+                    // günstige Verbindung = WLAN / Ethernet
+                    self?.connectionType = .wifi
                 }
 
                 if path.status == .satisfied {
-                    print("Netzwerkverbindung besteht.")
+                    print("Netzwerkverbindung besteht. (isExpensive: \(path.isExpensive))")
                 } else {
                     print("Keine Netzwerkverbindung.")
                 }
@@ -50,4 +52,6 @@ class NetworkMonitor: ObservableObject {
         monitor.cancel()
         print("Netzwerkmonitor gestoppt.")
     }
+    
 }
+

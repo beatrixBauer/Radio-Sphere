@@ -12,7 +12,7 @@ import SwiftUI
 
 struct ITunesLinkButton: View {
     let trackUrl: URL
-
+    var fontSize: CGFloat = 13
     var body: some View {
         Button(action: {
             UIApplication.shared.open(trackUrl, options: [:], completionHandler: nil)

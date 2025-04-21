@@ -14,8 +14,10 @@ class iTunesAPI {
 
     func getAlbumCover(artist: String, track: String, completion: @escaping (URL?, URL?) -> Void) {
         let query = "\(artist) \(track)".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-        let regionCode = Locale.current.region?.identifier ?? "DE"
-        let urlString = "https://itunes.apple.com/search?term=\(query)&entity=song&limit=1&country=\(regionCode)" // Link zum iTunesstore
+        let regionCode = Locale.current.region?.identifier ?? "US"
+        let urlString =
+          "https://itunes.apple.com/search?term=\(query)" +
+          "&entity=song&limit=1&country=\(regionCode)"
 
         guard let url = URL(string: urlString) else {
             completion(nil, nil)

@@ -23,31 +23,26 @@ struct SplashView: View {
             GlobeView()
                 .onAppear {
                     networkMonitor.startMonitoring()
+                }
+                // Erst wenn die Verbindung steht, laden wir die Stationen
+                .onChange(of: networkMonitor.connectionType) { _ in
+                    guard networkMonitor.isConnected else { return }
                     manager.loadStations {
-                        // Lese die Launch-Argumente aus, um zu entscheiden, wie lange der SplashScreen angezeigt werden soll.
-                        let arguments = ProcessInfo.processInfo.arguments
-                        let delay: TimeInterval = arguments.contains("UITest_SplashView") ? 6.0 : 4.0
-
+                        // Splash‑Delay nach dem Laden
+                        let args = ProcessInfo.processInfo.arguments
+                        let delay: TimeInterval = args.contains("UITest_SplashView") ? 6 : 4
                         DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-                            withAnimation {
-                                isActive = true
-                            }
-                        }
-                    }
-                    // Falls nach 3 Sekunden immer noch keine Verbindung besteht, zeige den Alert.
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                        if !networkMonitor.isConnected {
-                            showNoConnectionAlert = true
+                            withAnimation { isActive = true }
                         }
                     }
                 }
                 .alert("Keine Internetverbindung", isPresented: $showNoConnectionAlert) {
                     Button("Erneut prüfen") {
                         showNoConnectionAlert = false
-                        // Versuche erneut, die Stationen zu laden (Fallback greift hier)
-                        manager.loadStations {
-                            withAnimation {
-                                isActive = true
+                        // auch hier wieder warten, bis connectionType gesetzt ist
+                        if networkMonitor.isConnected {
+                            manager.loadStations {
+                                withAnimation { isActive = true }
                             }
                         }
                     }
@@ -57,6 +52,7 @@ struct SplashView: View {
         }
     }
 }
+
 
 #Preview {
     SplashView()

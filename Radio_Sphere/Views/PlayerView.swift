@@ -10,6 +10,8 @@ import SwiftUI
 // MARK: Ansicht des Players
 // Anzeige von Albumcover, Songtitel, Künstler etc.
 
+import SwiftUI
+
 struct PlayerView: View {
     @State var station: RadioStation
     let filteredStations: [RadioStation]
@@ -17,8 +19,13 @@ struct PlayerView: View {
     let isSheet: Bool
     @StateObject private var manager = StationsManager.shared
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.verticalSizeClass)   private var vSizeClass   // .regular | .compact
+    @Environment(\.horizontalSizeClass) private var hSizeClass   // .regular | .compact
 
-    init(station: RadioStation, filteredStations: [RadioStation], categoryTitle: String, isSheet: Bool) {
+    init(station: RadioStation,
+         filteredStations: [RadioStation],
+         categoryTitle: String,
+         isSheet: Bool) {
         _station = State(initialValue: station)
         self.filteredStations = filteredStations
         self.categoryTitle = categoryTitle
@@ -26,96 +33,113 @@ struct PlayerView: View {
     }
 
     var body: some View {
-
-        GeometryReader { geometry in
-            let isCompact = geometry.size.height < 700
-            VStack {
-                if isSheet {
-                    HStack {
-                        Button {
-                            dismiss()
-                        } label: {
+        GeometryReader { geo in
+            let hasNotch = UIDevice.current.hasNotchAtWindowLevel
+            let isMini  = UIDevice.current.isMiniNotch
+            let isMedium = UIDevice.current.isMediumNotch
+            //let isLarge = UIDevice.current.isLargeNotch
+            let isCompact = hSizeClass == .compact && geo.size.height < 750
+            let horizontalPadding = isCompact ? 20.0 : 30.0
+            let bottomPadding     = isCompact ? 10.0 : 20.0
+            let verticalSpacing: CGFloat =  !hasNotch   ? 2.0
+                                    : isMini ? 10
+                                    : isMedium ? 15
+                                    : 15
+            let horizontalSpacing: CGFloat = !hasNotch || isMini ? 30 : isMedium ? 40 : 50
+            let titleFont: Font = !hasNotch || isMini ? .title3 : isMedium ? .title2 : .title
+            let artwortSize: CGFloat = !hasNotch || isMini ? 250 : isMedium ? 280 : 300
+            let iTunesFontSize: CGFloat = !hasNotch || isMini ? 11 : isMedium ? 12 : 13
+            let actionButtonSize: CGFloat = !hasNotch || isMini ? 20 : isMedium ? 25 : 30
+            let playButtonSize = actionButtonSize + 10
+            let mediumFont: Font = !hasNotch || isMini ? .body : isMedium ? .title3 : .title2
+            
+            VStack(spacing: verticalSpacing) {
+                // MARK: – Dismiss‑Button + Play‑Indicator (Overlay)
+                
+                HStack {
+                    // Nur im Sheet‑Modus zeigen wir den Chevron‑Button
+                    if isSheet {
+                        Button { dismiss() } label: {
                             Image(systemName: "chevron.down.circle")
                                 .font(.title)
                                 .foregroundColor(.white.opacity(0.8))
                         }
-                        .padding(20)
-                        Spacer()
                     }
+
+                    Spacer()  // schiebt alles nach links
+
+                }
+                .padding(20)  // gilt für Button‑HStack
+                .overlay(alignment: .trailing) {
+                    // immer sichtbare Play‑Indicator‑Logik
+                    Group {
+                        if manager.isPlaying {
+                            NowPlayingBarView()
+                        } else {
+                            Image(systemName: "waveform")
+                                .resizable()
+                                .scaledToFit()
+                                .foregroundColor(.gray)
+                        }
+                    }
+                    .frame(width: 20, height: 20)
+                    .padding(.horizontal, horizontalPadding)
                 }
 
-                HStack {
-                    // Sendername: Schriftgröße wird dynamisch gewählt
-                    MarqueeText(text: station.decodedName,
-                                font: isCompact ? .title : .title2,
-                                speed: 40)
-                        .frame(maxWidth: .infinity)
-                        .padding(.trailing, 20)
-
-                    Spacer()
-
-                    if manager.isPlaying {
-                        NowPlayingBarView()
-                            .frame(width: 20, height: 20)
-                    } else {
-                        Image(systemName: "waveform")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 20, height: 20)
-                            .foregroundColor(.gray)
-                    }
-                }
+                // MARK: – MarqueeText
+                MarqueeText(
+                    text: station.decodedName,
+                    font: titleFont,
+                    speed: 40
+                )
                 .frame(maxWidth: .infinity, alignment: .trailing)
-                .padding(.horizontal, isCompact ? 20 : 40)
-                .padding(.bottom, isCompact ? 10 : 20)
+                .padding(.horizontal, horizontalPadding)
+                .padding(.bottom, 10)
 
+                // MARK: – AlbumArtwork + Buffer + iTunes‑Button
                 ZStack(alignment: .bottomTrailing) {
-                    // AlbumArtworkView aufrufen und die Größe anpassen:
-                    AlbumArtworkView(artworkURL: manager.currentArtworkURL,
-                                     frameWidth: isCompact ? 250 : 300,
-                                     frameHeight: isCompact ? 250 : 300)
-
+                    AlbumArtworkView(
+                        artworkURL: manager.currentArtworkURL,
+                        frameWidth: artwortSize,
+                        frameHeight: artwortSize
+                    )
                     if manager.isBuffering {
                         ProgressView()
                             .progressViewStyle(CircularProgressViewStyle(tint: .white))
                             .scaleEffect(1.2)
-                            // legt Spinner zentriert übers Cover
-                            .frame(width: isCompact ? 250 : 300,
-                                   height: isCompact ? 250 : 300,
-                                   alignment: .center)
+                            .frame(
+                                width: artwortSize,
+                                height: artwortSize
+                            )
                     }
-                    
-                    // Neuen ITunesLinkButton einfügen – vorausgesetzt, du hast bereits die URL (trackViewUrl) ermittelt
                     if let trackUrl = manager.currentTrackURL {
-                        ITunesLinkButton(trackUrl: trackUrl)
-                            .padding(.top, 8)
-                            .offset(x: 15, y: 15)
+                      ITunesLinkButton(trackUrl: trackUrl, fontSize: iTunesFontSize)
+                        .padding(.top, 8)
+                        .offset(x: 15, y: 15)
                     }
                 }
                 .padding(.bottom, 10)
 
+                // MARK: – Volume Slider
                 VolumeSliderView()
 
-                // Künstler und aktueller Song: Schriftgröße wird angepasst
-                Text(manager.currentTrack.fixEncoding())
-                    .font(isCompact ? .title3 : .body)
-                    .fontWeight(.semibold)
-                    .lineLimit(1)
-                    .truncationMode(.tail)
-                
-                Text(manager.currentArtist.fixEncoding())
-                    .font(isCompact ? .title3 : .body)
-                    .fontWeight(.semibold)
-                    .lineLimit(1)
-                    .truncationMode(.tail)
+                // MARK: – Track & Artist
+                VStack(spacing: 2) {
+                    Text(manager.currentTrack.fixEncoding())
+                    Text(manager.currentArtist.fixEncoding())
+                }
+                .font(mediumFont)
+                .fontWeight(.semibold)
+                .lineLimit(1)
+                .truncationMode(.tail)
 
-                HStack(spacing: isCompact ? 30 : 50) {
-                    // Previous-Button mit angepasster Größe
-                    ActionButton(systemName: "backward.fill", buttonSize: isCompact ? 25 : 28) {
+                // MARK: – Playback Controls
+                HStack(spacing: horizontalSpacing) {
+                    ActionButton(systemName: "backward.fill",
+                                 buttonSize: actionButtonSize) {
                         manager.setPrevious()
                     }
 
-                    // Play/Pause-Button bleibt wie gehabt (hier definieren wir die Größe direkt)
                     Button {
                         if manager.isPlaying && manager.currentStation == station {
                             manager.pausePlayback()
@@ -123,60 +147,70 @@ struct PlayerView: View {
                             manager.set(station: station)
                         }
                     } label: {
-                        Image(systemName: manager.isPlaying && manager.currentStation == station ? "pause.circle.fill" : "play.circle.fill")
-                            .resizable()
-                            .frame(width: isCompact ? 35 : 40, height: isCompact ? 35 : 40)
-                            .foregroundColor(manager.isPlaying && manager.currentStation?.id == station.id ? Color("goldorange") : .gray)
-                            .shadow(radius: 4)
+                        Image(systemName:
+                            manager.isPlaying && manager.currentStation == station
+                            ? "pause.circle.fill"
+                            : "play.circle.fill"
+                        )
+                        .resizable()
+                        .frame(
+                            width: playButtonSize,
+                            height: playButtonSize
+                        )
+                        .foregroundColor(
+                            manager.isPlaying &&
+                            manager.currentStation?.id == station.id
+                            ? Color("goldorange") : .gray
+                        )
+                        .shadow(radius: 4)
                     }
 
-                    // Next-Button mit angepasster Größe
-                    ActionButton(systemName: "forward.fill", buttonSize: isCompact ? 25 : 28) {
+                    ActionButton(systemName: "forward.fill",
+                                 buttonSize: actionButtonSize) {
                         manager.setNext()
                     }
                 }
-                .padding(.vertical, isCompact ? 10 : 20)
+                .padding(.vertical, bottomPadding)
 
+                // MARK: – SleepTimer + LikeButton
                 HStack {
-                    SleepTimerView(iconSize: isCompact ? 23 : 28)
-                    // Hier wird der Countdown des Sleep-Timers angezeigt, sofern aktiv
-                    if manager.isSleepTimerActive, let remaining = manager.sleepTimerRemainingTime {
-                        Text("\(remaining.asMMSS)")
+                    SleepTimerView(iconSize: actionButtonSize)
+                    if manager.isSleepTimerActive,
+                       let remaining = manager.sleepTimerRemainingTime {
+                        Text(remaining.asMMSS)
                             .font(isCompact ? .caption : .subheadline)
                             .foregroundColor(.white)
-                            .padding(.top, 5)
                     }
                     Spacer()
-                    LikeButton(station: station, buttonSize: isCompact ? 23 : 28)
-                        .frame(maxWidth: .infinity, alignment: .trailing)
+                    LikeButton(station: station,
+                               buttonSize: actionButtonSize)
                 }
-                .padding(.horizontal, 40)
+                .padding(.horizontal, horizontalPadding)
+
+                Spacer() // drückt den Stack nach oben
             }
-            .frame(maxHeight: .infinity, alignment: .center)
-            .padding(.horizontal, 10)
+            .padding(.horizontal, 20)
             .padding(.bottom, 20)
+            .frame(maxHeight: .infinity, alignment: .top)
             .applyBackgroundGradient()
             .preferredColorScheme(.dark)
             .onAppear {
                 manager.isInPlayerView = true
-                manager.prepareForPlayback(station: station, in: filteredStations)
+                manager.prepareForPlayback(
+                    station: station,
+                    in: filteredStations
+                )
             }
             .onDisappear {
                 manager.isInPlayerView = false
             }
             .onChange(of: manager.currentStation) { newStation in
-                if let newStation = newStation, station.id != newStation.id {
+                if let newStation = newStation,
+                   station.id != newStation.id {
                     station = newStation
-                    print("PlayerView aktualisiert: \(station.decodedName)")
                 }
             }
         }
     }
-    
-    // Hilfsfunktion zur Formatierung von Sekunden in mm:ss
-    private func formatTime(_ seconds: Int) -> String {
-        let minutes = seconds / 60
-        let secs = seconds % 60
-        return String(format: "%02d:%02d", minutes, secs)
-    }
 }
+

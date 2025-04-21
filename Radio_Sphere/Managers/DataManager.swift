@@ -37,19 +37,34 @@ class DataManager {
         
         // Wenn keine frische Datei im Documents-Verzeichnis vorhanden ist, wird die API-Anfrage ausgelöst.
         if NetworkMonitor.shared.connectionType == .cellular {
-            // Bei Mobilfunk: erste 500 Sender abrufen.
-            api.fetchStations(offset: 0, limit: 500) { [weak self] initialStations in
+            // Bei Mobilfunk: zuerst 5000 Sender laden
+            api.fetchStations(offset: 0, limit: 5000) { [weak self] initialStations in
                 guard let self = self else { return }
+
                 if !initialStations.isEmpty {
-                    self.saveStationsToDocuments(stations: initialStations)
-                    completion(initialStations)
-                    // Starte im Hintergrund die paginierte Abfrage.
-                    self.fetchAllStationsPaginated(startingFrom: 500)
+                    // Duplikate entfernen und speichern
+                    let uniqueInitial = Array(Set(initialStations))
+                    self.saveStationsToDocuments(stations: uniqueInitial)
+
+                    // Erste Sender direkt verfügbar machen
+                    DispatchQueue.main.async {
+                        StationsManager.shared.allStations = uniqueInitial
+                        completion(uniqueInitial) // MainView darf starten
+                    }
+
+                    // Hintergrund: restliche Sender nachladen
+                    self.fetchAllStationsPaginated(startingFrom: 5000, aggregated: uniqueInitial) { finalStations in
+                        DispatchQueue.main.async {
+                            StationsManager.shared.allStations = finalStations
+                            self.saveStationsToDocuments(stations: finalStations)
+                            print("Alle Stationen vollständig geladen: \(finalStations.count)")
+                        }
+                    }
                 } else {
                     // API-Anfrage schlug fehl, versuche aus dem Documents-Verzeichnis zu laden.
-                    let localStations = self.loadStationsFromDocuments()
-                    if !localStations.isEmpty {
-                        completion(localStations)
+                    let backupStations = self.loadStationsFromDocuments()
+                    if !backupStations.isEmpty {
+                        completion(backupStations)
                     } else {
                         // Fallback: stations.json aus dem Bundle kopieren und erneut laden.
                         self.copyStationsFromBundleToDocuments()
@@ -133,71 +148,32 @@ class DataManager {
     }
 
     // MARK: Paginierte Abfrage im Hintergrund
-    /// Ruft sukzessive weitere Senderseiten ab, beginnt beim angegebenen Offset und fügt sie der lokalen Kopie hinzu.
-    private func fetchAllStationsPaginated(startingFrom offset: Int) {
-        let pageLimit = 500
+    private func fetchAllStationsPaginated(startingFrom offset: Int, aggregated: [RadioStation], pageLimit: Int = 5000, completion: @escaping ([RadioStation]) -> Void) {
         api.fetchStations(offset: offset, limit: pageLimit) { [weak self] nextStations in
             guard let self = self else { return }
-            if nextStations.isEmpty {
-                print("Alle zusätzlichen Sender wurden abgerufen.")
+
+            var updated = aggregated
+            updated.append(contentsOf: nextStations)
+            updated = Array(Set(updated))
+
+            // Laufzeit-Update
+            DispatchQueue.main.async {
+                StationsManager.shared.allStations = updated
+                print("Aktueller Stand während Ladevorgang: \(updated.count) Stationen")
+            }
+
+            // Beenden, wenn letzte Seite
+            if nextStations.count < pageLimit {
+                completion(updated)
             } else {
-                // Lade die bisher gespeicherten Stationen
-                var currentStations = self.loadStationsFromDocuments()
-                // Füge die neu abgerufenen Sender hinzu
-                currentStations.append(contentsOf: nextStations)
-                // Entferne Duplikate – vorausgesetzt, RadioStation implementiert Hashable
-                let uniqueStations = Array(Set(currentStations))
-                self.saveStationsToDocuments(stations: uniqueStations)
-                print("Zusätzliche \(nextStations.count) Sender abgerufen, Gesamtanzahl: \(uniqueStations.count)")
-                // Rekursiver Aufruf, um die nächste Seite abzurufen
-                self.fetchAllStationsPaginated(startingFrom: offset + pageLimit)
+                DispatchQueue.global().asyncAfter(deadline: .now() + 0.2) {
+                    self.fetchAllStationsPaginated(startingFrom: offset + pageLimit, aggregated: updated, pageLimit: pageLimit, completion: completion)
+                }
             }
         }
     }
+
 }
 
 
-/*func getAllStations(completion: @escaping ([RadioStation]) -> Void) {
-     // Unterscheide anhand des Verbindungstyps
-     if NetworkMonitor.shared.connectionType == .cellular {
-         // Bei Mobilfunk: erste 1000 Sender abrufen
-         api.fetchStations(offset: 0, limit: 1000) { [weak self] initialStations in
-             guard let self = self else { return }
-             if !initialStations.isEmpty {
-                 self.saveStationsToDocuments(stations: initialStations)
-                 completion(initialStations)
-                 // Starte im Hintergrund die paginierte Abfrage
-                 self.fetchAllStationsPaginated(startingFrom: 1000)
-             } else {
-                 // Remote-Call schlug fehl – lade aus dem Documents-Verzeichnis
-                 let localStations = self.loadStationsFromDocuments()
-                 if !localStations.isEmpty {
-                     completion(localStations)
-                 } else {
-                     // Fallback: stations.json aus dem Bundle kopieren und erneut laden
-                     self.copyStationsFromBundleToDocuments()
-                     let fallbackStations = self.loadStationsFromDocuments()
-                     completion(fallbackStations)
-                 }
-             }
-         }
-     } else {
-         // Bei WLAN: vollständige Abfrage
-         api.fetchAllStations { [weak self] remoteStations in
-             guard let self = self else { return }
-             if !remoteStations.isEmpty {
-                 self.saveStationsToDocuments(stations: remoteStations)
-                 completion(remoteStations)
-             } else {
-                 let localStations = self.loadStationsFromDocuments()
-                 if !localStations.isEmpty {
-                     completion(localStations)
-                 } else {
-                     self.copyStationsFromBundleToDocuments()
-                     let fallbackStations = self.loadStationsFromDocuments()
-                     completion(fallbackStations)
-                 }
-             }
-         }
-     }
- }*/
+

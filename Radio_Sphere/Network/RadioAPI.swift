@@ -25,9 +25,10 @@ class RadioAPI {
         self.session = session
     }
 
-    /// Ruft alle Stationen remote ab (nur HTTPS-Sender)
     func fetchAllStations(completion: @escaping ([RadioStation]) -> Void) {
-        let remoteURL = baseURL + "/search?hidebroken=true&lastcheckok=1&is_https=true"
+        // baseURL = "<bestes‑Mirror>/json/stations"
+        let remoteURL = baseURL + "/search?hidebroken=true&lastcheckok=1&is_https=true&limit=50000"
+        print("fetching all stations from \(remoteURL)")
         performRequest(urlString: remoteURL, completion: completion)
     }
 
