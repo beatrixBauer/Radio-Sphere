@@ -16,7 +16,6 @@ struct AlbumArtworkView: View {
     let frameWidth: CGFloat
     let frameHeight: CGFloat
 
-    // Standardwerte: 300x300
     init(artworkURL: URL?, frameWidth: CGFloat = 300, frameHeight: CGFloat = 300) {
         self.artworkURL = artworkURL
         self.frameWidth = frameWidth
@@ -25,7 +24,7 @@ struct AlbumArtworkView: View {
 
     var body: some View {
         ZStack {
-            if let artworkURL = artworkURL {
+            if let artworkURL = artworkURL, isImageURL(artworkURL) {
                 AsyncImage(url: artworkURL) { phase in
                     switch phase {
                     case .empty:
@@ -63,4 +62,11 @@ struct AlbumArtworkView: View {
         .frame(width: frameWidth, height: frameHeight)
         .cornerRadius(10)
     }
+
+    // Hilfsfunktion: prüft, ob die URL auf ein Bild zeigt
+    private func isImageURL(_ url: URL) -> Bool {
+        let imageExtensions = ["jpg", "jpeg", "png", "gif", "webp"]
+        return imageExtensions.contains(url.pathExtension.lowercased())
+    }
 }
+

@@ -15,7 +15,7 @@ class MainViewUITests: XCTestCase {
         super.setUp()
         continueAfterFailure = false
         app = XCUIApplication()
-        // Launch-Argument, das in deinem App-Code abgefragt wird, um den Offline-Modus zu simulieren.
+        // Launch-Argument, um den Offline-Modus zu simulieren.
         app.launchArguments.append("UITest_NoInternet")
         app.launch()
     }
@@ -26,7 +26,7 @@ class MainViewUITests: XCTestCase {
     }
 
     func testNoInternetAlertAppears() {
-        // Wir erwarten, dass ein Alert mit dem Titel "Keine Internetverbindung" erscheint.
+        // Erwartung, dass ein Alert mit dem Titel "Keine Internetverbindung" erscheint.
         let alert = app.alerts["Keine Internetverbindung"]
         let exists = NSPredicate(format: "exists == true")
 

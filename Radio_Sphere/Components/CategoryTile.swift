@@ -49,22 +49,3 @@ struct CategoryTile: View {
         .frame(height: 120)
     }
 }
-
-
-/*struct CategoryTile<BackgroundStyle: ShapeStyle>: View {
-    let title: String
-    let background: BackgroundStyle
-
-    var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 12)
-                .fill(background)
-                .frame(height: 120)
-
-            Text(title)
-                .font(.headline)
-                .foregroundColor(.white)
-                .bold()
-        }
-    }
-}*/

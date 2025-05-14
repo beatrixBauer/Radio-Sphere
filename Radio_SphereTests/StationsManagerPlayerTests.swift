@@ -22,7 +22,7 @@ final class StationsManagerPlayerTests: XCTestCase {
         manager.currentTrack = "Some Track"
         manager.currentArtist = "Some Artist"
         manager.currentArtworkURL = URL(string: "https://example.com/artwork")
-        // Wir ignorieren den Player selbst, da er über FRadioPlayer.shared läuft.
+        
     }
 
     override func tearDown() {

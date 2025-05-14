@@ -26,7 +26,7 @@ class SplashViewUITests: XCTestCase {
     }
 
     func testSplashViewDisplaysAppName() {
-        // Wir warten darauf, dass der Text "Radio Sphere" (der Name der App) sichtbar wird.
+        // Warten darauf, dass der Name der App sichtbar wird
         let appNameLabel = app.staticTexts["Radio Sphere"]
         let exists = NSPredicate(format: "exists == true")
         expectation(for: exists, evaluatedWith: appNameLabel, handler: nil)

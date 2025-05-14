@@ -32,7 +32,7 @@ enum MusicBrainzError: Error {
 class MusicBrainzAPI {
     static let shared = MusicBrainzAPI()
 
-    private let userAgent = "Radio_Sphere/0.1 (beatrix.bauer@gmail.com)"
+    private let userAgent = "Radio_Sphere/1.0 (beatrix.bauer@gmail.com)"
 
     // MARK: Fragt das Album-Cover bei MusicBrainz ab, falls verfügbar
     func getAlbumCover(artistName: String, trackTitle: String, completion: @escaping (Result<URL, MusicBrainzError>) -> Void) {

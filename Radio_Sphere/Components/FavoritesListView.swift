@@ -27,6 +27,8 @@ struct FavoritesListView: View {
                     isActive: station.id.lowercased() == manager.currentStation?.id.lowercased()
                 )
                 .listRowBackground(Color.clear)
+                // Padding von 50 für den letzten Eintrag hinzufügen
+                .padding(.bottom, index == filteredStations.count - 1 ? 80 : 0)
             }
             .onDelete { offsets in
                 for index in offsets {

@@ -22,7 +22,7 @@ final class StationsManagerFilterTests: XCTestCase {
         manager.searchText = ""
         manager.searchActive = false
         manager.selectedCountry = "Alle"
-        manager.alphabetical = false
+        manager.sortMode = .grouped
     }
 
     override func tearDown() {
@@ -91,7 +91,7 @@ final class StationsManagerFilterTests: XCTestCase {
         let station1 = RadioStation(testID: "1", testName: "B Station", testTags: "pop", testCountry: "Germany", testCountryCode: "DE")
         let station2 = RadioStation(testID: "2", testName: "A Station", testTags: "pop", testCountry: "Germany", testCountryCode: "DE")
         manager.stationsByCategory[.pop] = [station1, station2]
-        manager.alphabetical = true
+        manager.sortMode = .alphaAsc
 
         let filtered = manager.applyFilters(to: .pop)
         XCTAssertEqual(filtered.count, 2, "Beide Stationen sollten zurückgegeben werden.")

@@ -8,6 +8,7 @@
 import XCTest
 @testable import Radio_Sphere
 
+// Hilft beim Testen des Paginierten ladens, indem der Handler die Parameter ausliest
 class MockURLProtocol: URLProtocol {
     static var requestHandler: ((URLRequest) throws -> (HTTPURLResponse, Data))?
 

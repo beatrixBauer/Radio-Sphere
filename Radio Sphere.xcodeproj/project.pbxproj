@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		819E43672DC5039700CD35F6 /* FRadioPlayer in Frameworks */ = {isa = PBXBuildFile; productRef = 819E43662DC5039700CD35F6 /* FRadioPlayer */; };
+		819E43692DC503DD00CD35F6 /* FRadioPlayer in Frameworks */ = {isa = PBXBuildFile; productRef = 819E43682DC503DD00CD35F6 /* FRadioPlayer */; };
 		81A7920A2D68857D00004664 /* FRadioPlayer in Frameworks */ = {isa = PBXBuildFile; productRef = 81A792092D68857D00004664 /* FRadioPlayer */; };
 		81B9D7822DA6BFC600081A58 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 81B9D7812DA6BFC600081A58 /* Localizable.xcstrings */; };
 /* End PBXBuildFile section */
@@ -67,6 +69,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				819E43672DC5039700CD35F6 /* FRadioPlayer in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -74,12 +77,20 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				819E43692DC503DD00CD35F6 /* FRadioPlayer in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		819E43652DC5039700CD35F6 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		81A791CE2D68853900004664 = {
 			isa = PBXGroup;
 			children = (
@@ -88,6 +99,7 @@
 				81A791D92D68853900004664 /* Radio_Sphere */,
 				81A791EA2D68853B00004664 /* Radio_SphereTests */,
 				81A791F42D68853B00004664 /* Radio_SphereUITests */,
+				819E43652DC5039700CD35F6 /* Frameworks */,
 				81A791D82D68853900004664 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -142,10 +154,12 @@
 				81A791E92D68853B00004664 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
+				81A791D92D68853900004664 /* Radio_Sphere */,
 				81A791EA2D68853B00004664 /* Radio_SphereTests */,
 			);
 			name = "Radio SphereTests";
 			packageProductDependencies = (
+				819E43662DC5039700CD35F6 /* FRadioPlayer */,
 			);
 			productName = Radio_SphereTests;
 			productReference = 81A791E72D68853B00004664 /* Radio SphereTests.xctest */;
@@ -165,10 +179,12 @@
 				81A791F32D68853B00004664 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
+				81A791D92D68853900004664 /* Radio_Sphere */,
 				81A791F42D68853B00004664 /* Radio_SphereUITests */,
 			);
 			name = "Radio SphereUITests";
 			packageProductDependencies = (
+				819E43682DC503DD00CD35F6 /* FRadioPlayer */,
 			);
 			productName = Radio_SphereUITests;
 			productReference = 81A791F12D68853B00004664 /* Radio SphereUITests.xctest */;
@@ -595,6 +611,16 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		819E43662DC5039700CD35F6 /* FRadioPlayer */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 81A792082D68857D00004664 /* XCRemoteSwiftPackageReference "FRadioPlayer" */;
+			productName = FRadioPlayer;
+		};
+		819E43682DC503DD00CD35F6 /* FRadioPlayer */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 81A792082D68857D00004664 /* XCRemoteSwiftPackageReference "FRadioPlayer" */;
+			productName = FRadioPlayer;
+		};
 		81A792092D68857D00004664 /* FRadioPlayer */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 81A792082D68857D00004664 /* XCRemoteSwiftPackageReference "FRadioPlayer" */;

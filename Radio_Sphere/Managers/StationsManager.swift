@@ -10,7 +10,7 @@ import FRadioPlayer
 import MediaPlayer
 import Combine
 
-class StationsManager: ObservableObject, FRadioPlayerDelegate {
+class StationsManager: ObservableObject {
 
     static let shared = StationsManager()                                               // Singleton StationsManager
     private let locationManager = LocationManager.shared                                // Zugriff auf die Logik im LocationManager
@@ -414,16 +414,16 @@ extension StationsManager {
     func fetchLocalStations() {
         let locationManager = LocationManager.shared
         let allStationsGlobal = self.allStations
-        // Hole den Fallback-Ländercode aus der Locale – standardmäßig „de“
+        // Holt den Fallback-Ländercode aus der Locale – standardmäßig „de“
         let fallbackCountry = (Locale.current.region?.identifier ?? "de").lowercased()
         
-        // Prüfe, ob ein aktueller Standort vorliegt:
+        // Prüft, ob ein aktueller Standort vorliegt:
         if let _ = locationManager.currentLocation {
             // Standort wurde ermittelt – normale Filterung
             let stationsByProximity = locationManager.filterStationsByProximity(allStationsGlobal, maxDistance: 50000.0)
             print("Sender im Umkreis von 50 km: \(stationsByProximity.count)")
             
-            // Versuche, Sender anhand des Bundeslandes zu filtern (falls vorhanden)
+            // Versucht, Sender anhand des Bundeslandes zu filtern (falls vorhanden)
             let stationsByState: [RadioStation] = {
                 if let state = locationManager.state, !state.isEmpty {
                     return allStationsGlobal.filter { station in
@@ -435,7 +435,7 @@ extension StationsManager {
             }()
             print("Sender basierend auf dem Bundesland: \(stationsByState.count)")
             
-            // Kombiniere beide Filter-Ergebnisse
+            // Kombiniert beide Filter-Ergebnisse
             let combinedStations = stationsByProximity + stationsByState
             let uniqueStations = Array(Dictionary(combinedStations.map { ($0.id, $0) },
                                                   uniquingKeysWith: { first, _ in first }).values)
@@ -445,7 +445,7 @@ extension StationsManager {
                 ? allStationsGlobal.filter { $0.country.lowercased() == fallbackCountry }
                 : uniqueStations
             
-            // Sortiere die Sender nach Distanz (falls der Standort verfügbar ist)
+            // Sortiert die Sender nach Distanz (falls der Standort verfügbar ist)
             let sortedStations = finalStations.sorted { first, second in
                 let distanceA = locationManager.getDistanceToStation(station: first) ?? Double.infinity
                 let distanceB = locationManager.getDistanceToStation(station: second) ?? Double.infinity
@@ -458,7 +458,7 @@ extension StationsManager {
             }
             
         } else {
-            // Es wurde keine Standortberechtigung erteilt – daher einfach nach countrycode filtern
+            // Keine Standortberechtigung erteilt – daher einfach nach countrycode filtern
             let filteredByCountry = allStationsGlobal.filter { station in
                 station.countrycode.lowercased() == fallbackCountry
             }
@@ -483,7 +483,7 @@ extension StationsManager {
     }
 }
 
-// MARK: Globe Suchfunktion (SearchView)
+// MARK: Globale Suchfunktion (SearchView)
 extension StationsManager {
     /// Kategorieübergreifende Suche in der SearchView
     /// Nutzt die Hilfsfunktion MatchScore
@@ -497,7 +497,7 @@ extension StationsManager {
         
         let queryLower = globalSearchText.lowercased()
         
-        // Suche nach Sendernamen und Tags (Genre)
+        // Sucht nach Sendernamen und Tags (Genre)
         let results = allStations.filter { station in
             return station.decodedName.lowercased().contains(queryLower) ||
                    (station.decodedTags?.lowercased().contains(queryLower) ?? false)
@@ -505,7 +505,7 @@ extension StationsManager {
         
         let uniqueStations = filterUniqueStationsByName(results)
         
-        // Sortiere die Treffer nach Score (bessere Übereinstimmung zuerst) und danach alphabetisch
+        // Sortiert die Treffer nach Score (bessere Übereinstimmung zuerst) und danach alphabetisch
         let sortedStations = uniqueStations.sorted { station1, station2 in
             let score1 = matchScore(for: station1, query: queryLower)
             let score2 = matchScore(for: station2, query: queryLower)
@@ -539,11 +539,11 @@ extension StationsManager {
         else if name.contains(query) {
             return 2
         }
-        // Falls die Tags den Suchtext enthalten, gib einen etwas höheren Score zurück
+        // Tags enthalten den Suchtext
         else if tags.contains(query) {
             return 3
         }
-        // Kein Treffer (sollte in der Filterung nicht vorkommen, da wir nur passende Sender haben)
+        // Kein Treffer
         else {
             return 4
         }
@@ -695,7 +695,7 @@ extension StationsManager {
 }
 
 // MARK: Metadaten Handling mit FRadioPlayer
-extension StationsManager {
+extension StationsManager : FRadioPlayerDelegate {
     /// Wird aufgerufen, wenn Metadaten sich ändern (Songtitel & Künstler)
     func radioPlayer(_ player: FRadioPlayer, metadataDidChange artistName: String?, trackName: String?) {
         DispatchQueue.main.async {
@@ -770,7 +770,7 @@ extension StationsManager {
                 if let coverUrl = coverUrl {
                     print("iTunes Cover gefunden: \(coverUrl)")
                     self.currentArtworkURL = coverUrl
-                    // Setze die TrackURL nur, wenn sie vorhanden ist.
+                    // Setzt die TrackURL, wenn vorhanden
                     self.currentTrackURL = trackUrl
                     if let trackUrl = trackUrl {
                         print("iTunes Track URL gefunden: \(trackUrl)")
@@ -779,21 +779,18 @@ extension StationsManager {
                 } else {
                     print("Kein Cover von iTunes gefunden, versuche MusicBrainz...")
 
-                    // Wenn MusicBrainz genutzt wird, könntest du currentTrackURL auch auf nil setzen,
-                    // falls es dort keinen Link gibt.
+                    //Alternatives Cover durch MusicBrainz
                     MusicBrainzAPI.shared.getAlbumCover(artistName: self.currentArtist, trackTitle: self.currentTrack) { result in
                         DispatchQueue.main.async {
                             switch result {
                             case .success(let url):
                                 print("MusicBrainz Cover gefunden: \(url)")
                                 self.currentArtworkURL = url
-                                // Hier: Da von MusicBrainz normalerweise kein Track-Link geliefert wird,
-                                // setzen wir currentTrackURL auf nil:
                                 self.currentTrackURL = nil
                                 self.updateLockScreen()
                             case .failure(let error):
                                 print("Kein Albumcover verfügbar: \(error)")
-                                self.currentTrackURL = nil  // Sicherstellen, dass hier nil gesetzt wird.
+                                self.currentTrackURL = nil
                             }
                         }
                     }
@@ -870,7 +867,7 @@ extension StationsManager {
                 return
             }
 
-            // Falls bereits ein 1200x1200 Cover vorhanden ist, ignorieren wir 100x100
+            // Falls bereits ein 1200x1200 Cover vorhanden ist, wird 100x100 ignoriert
             if let currentURL = self.currentArtworkURL, currentURL.absoluteString.contains("1200x1200") {
                 return
             }
