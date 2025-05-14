@@ -11,87 +11,60 @@ import SwiftUI
 
 struct SearchView: View {
     @ObservedObject private var manager = StationsManager.shared
-    @State private var isSearching: Bool = false
-    @State private var searchCompleted: Bool = false
+    @State private var isSearching      = false
+    @State private var searchCompleted  = false
 
     var body: some View {
         NavigationStack {
-            ZStack {
-                // Liste mit Suchergebnissen (wenn welche vorhanden sind)
-                if !manager.searchedStations.isEmpty {
-                    List {
-                        ForEach(Array(manager.searchedStations.enumerated()), id: \.element.id) { index, station in
-                            StationRow(
-                                station: station,
-                                index: index,
-                                filteredStations: manager.searchedStations,
-                                categoryDisplayName: "Suche",
-                                isActive: station.id.lowercased() == manager.currentStation?.id.lowercased()
-                            )
-                            .listRowBackground(Color.clear)
-                            .listRowInsets(EdgeInsets())
-                        }
-                    }
-                    .listStyle(.plain)
+            List {
+                ForEach(Array(manager.searchedStations.enumerated()), id: \.element.id) { index, station in
+                    StationRow(
+                        station: station,
+                        index: index,
+                        filteredStations: manager.searchedStations,
+                        categoryDisplayName: "Suche",
+                        isActive: station.id.lowercased() == manager.currentStation?.id.lowercased()
+                    )
+                    .listRowBackground(Color.clear)
+                    .listRowInsets(EdgeInsets())
+                    // verhindert, dass der letzte Eintrag unter die TabBar rutscht
+                    .padding(.bottom, index == manager.searchedStations.count - 1 ? 80 : 0)
                 }
-                // Ladeanimation während der Suche
-                else if isSearching {
-                    VStack(spacing: 16) {
-                        ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle())
-                        Text("Suche läuft…")
-                            .foregroundColor(.gray)
+            }
+            .listStyle(.plain)
+            .overlay {
+                Group {
+                    // Lade-Spinner
+                    if isSearching {
+                        ProgressView("Suche läuft…")
+                            .padding()
+                            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
                     }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Color.black.opacity(0.3))
-                }
-                // Overlay, wenn keine Ergebnisse vorliegen
-                else if manager.searchedStations.isEmpty {
-                    if searchCompleted {
-                        VStack(spacing: 16) {
-                            Image(systemName: "magnifyingglass")
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(width: 100, height: 100)
-                                .foregroundColor(.gray)
-                            Text("Leider nichts gefunden")
-                                .font(.title2)
-                                .foregroundColor(.gray)
-                        }
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    } else {
-                        VStack(spacing: 16) {
-                            Image(systemName: "music.note.list")
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(width: 100, height: 100)
-                                .foregroundColor(.gray)
-                            Text("Finde deinen Rhythmus…")
-                                .font(.title2)
-                                .foregroundColor(.gray)
-                        }
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    // „Nichts gefunden“- bzw. Platzhalter-Overlay
+                    else if searchCompleted && manager.searchedStations.isEmpty {
+                        EmptyPlaceholder(systemName: "magnifyingglass", text: "Leider nichts gefunden")
+                    }
+                    else if manager.searchedStations.isEmpty {
+                        EmptyPlaceholder(systemName: "music.note.list", text: "Finde deinen Rhythmus")
                     }
                 }
             }
             .applyBackgroundGradient()
             .navigationTitle("Suche")
             .searchable(text: $manager.globalSearchText, prompt: "Sender suchen")
-            .onSubmit(of: .search) {
-                // Wenn der Nutzer die Suche abschickt, starte den API-Aufruf
-                isSearching = true
+            .onSubmit(of: .search) {                      // Suche auslösen
+                isSearching     = true
                 searchCompleted = false
                 manager.performGlobalSearch {
-                    isSearching = false
+                    isSearching     = false
                     searchCompleted = true
                 }
             }
             .onChange(of: manager.globalSearchText) { newValue in
-                // Leere Suchergebnisse, wenn das Suchfeld geleert wird (z.B. beim Cancel)
                 if newValue.isEmpty {
                     manager.searchedStations = []
                     searchCompleted = false
-                    isSearching = false
+                    isSearching    = false
                 }
             }
         }
@@ -99,6 +72,23 @@ struct SearchView: View {
     }
 }
 
-#Preview {
-    SearchView()
+/// Kleiner Helfer für Platzhalter-Overlays
+private struct EmptyPlaceholder: View {
+    let systemName: String
+    let text: LocalizedStringKey
+    var body: some View {
+        VStack(spacing: 16) {
+            Image(systemName: systemName)
+                .resizable()
+                .scaledToFit()
+                .frame(width: 100)
+                .foregroundColor(.gray)
+            Text(text)
+                .font(.title2)
+                .foregroundColor(.gray)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
 }
+
+

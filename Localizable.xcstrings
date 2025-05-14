@@ -1,26 +1,8 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "%lld Minuten" : {
-      "comment" : "Timer Minuten Anzeige",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld Minuten"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld Minutes"
-          }
-        }
-      }
-    },
     "%lld Minuten" : {
-
+      "comment" : "Timerminuten"
     },
     "Abc" : {
       "comment" : "Alphabetisch sortieren",
@@ -498,8 +480,8 @@
         }
       }
     },
-    "Finde deinen Rhythmus…" : {
-      "comment" : "Finde deinen Rhythmus",
+    "Finde deinen Rhythmus" : {
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -510,7 +492,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Find your rhythm"
+            "value" : "Find your rhythm…"
           }
         }
       }
@@ -618,7 +600,8 @@
       }
     },
     "Leider nichts gefunden" : {
-      "comment" : "Leider nichts gefunden",
+      "comment" : "SearchView Ergebnisse",
+      "extractionState" : "manual",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -629,7 +612,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Unfortunately, no results found"
+            "value" : "No results found"
           }
         }
       }
