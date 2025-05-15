@@ -2,58 +2,68 @@
 //  SplashView.swift
 //  Radio_Sphere
 //
-//  Created by Beatrix Bauer on 16.04.25.
-//
 
 import SwiftUI
 
-// MARK: Startbildschirm und handling der Internet-Statusabfrage
-// Leitet zur MainView weiter
-
 struct SplashView: View {
-    @State private var isActive = false
+    @State private var isActive              = false
     @State private var showNoConnectionAlert = false
-    @ObservedObject private var networkMonitor = NetworkMonitor.shared
-    @ObservedObject private var manager = StationsManager.shared
-
+    @State private var hasLoadedStations     = false
+    @State private var splashStart           = Date()   // << Start-Zeit merken
+    
+    private let minSplashTime: TimeInterval  = 5.0      // Globe-Intro ≈ 5 s
+    
+    @ObservedObject private var net  = NetworkMonitor.shared
+    @ObservedObject private var mgr  = StationsManager.shared
+    let message = NSLocalizedString("no_connection_message", comment: "")
     var body: some View {
-        if isActive {
-            MainView()
-        } else {
-            GlobeView()
-                .onAppear {
-                    networkMonitor.startMonitoring()
-                }
-                // Erst wenn die Verbindung steht, laden wir die Stationen
-                .onChange(of: networkMonitor.connectionType) { _ in
-                    guard networkMonitor.isConnected else { return }
-                    manager.loadStations {
-                        // Splash‑Delay nach dem Laden
-                        let args = ProcessInfo.processInfo.arguments
-                        let delay: TimeInterval = args.contains("UITest_SplashView") ? 6 : 4
-                        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-                            withAnimation { isActive = true }
+        Group {
+            if isActive {
+                MainView()
+            } else {
+                GlobeView()
+                    .onAppear {
+                        splashStart = Date()             // Zeitpunkt des Starts
+                        net.startMonitoring()
+                    }
+                    .onReceive(net.$isConnected.dropFirst()) { connected in
+                        if connected {
+                            showNoConnectionAlert = false
+                            guard hasLoadedStations == false else { return }
+                            hasLoadedStations = true
+                            
+                            mgr.loadStations {
+                                // Warten, bis die Animation beendet ist
+                                let elapsed = Date().timeIntervalSince(splashStart)
+                                let extra   = max(0, minSplashTime - elapsed)
+                                
+                                DispatchQueue.main.asyncAfter(deadline: .now() + extra) {
+                                    withAnimation { isActive = true }
+                                }
+                            }
+                        } else {
+                            showNoConnectionAlert = true
                         }
                     }
-                }
-                .alert("Keine Internetverbindung", isPresented: $showNoConnectionAlert) {
-                    Button("Erneut prüfen") {
-                        showNoConnectionAlert = false
-                        // auch hier wieder warten, bis connectionType gesetzt ist
-                        if networkMonitor.isConnected {
-                            manager.loadStations {
-                                withAnimation { isActive = true }
+                    .alert("Keine Internetverbindung", isPresented: $showNoConnectionAlert) {
+                        Button("Erneut prüfen") {
+                            if net.isConnected {
+                                // Netz da → Alert endgültig schließen
+                                showNoConnectionAlert = false
+                            } else {
+                                // Noch offline → Alert nach dem automatischen Dismiss gleich neu öffnen
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { //kurze Wartezeit, nach "Erneut prüfen" um Flackereffekt zu vermeiden
+                                    if !net.isConnected {   // noch kein Netz?
+                                        showNoConnectionAlert = true   // → Alert erneut anzeigen
+                                    }
+                                }
                             }
                         }
+                    } message: {
+                        Text(message)
                     }
-                } message: {
-                    Text("Für die Nutzung der RadioApp ist eine Internetverbindung notwendig. Bitte verbinde dich mit dem Internet.")
-                }
+
+            }
         }
     }
-}
-
-
-#Preview {
-    SplashView()
 }

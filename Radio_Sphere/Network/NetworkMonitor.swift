@@ -8,50 +8,50 @@
 import Network
 import Combine
 
-/// Überprüfung der Internetverbindung beim Start der App -> wird von SplashView aufgerufen
-class NetworkMonitor: ObservableObject {
+/// Überprüft die Internetverbindung und veröffentlicht Statusänderungen.
+final class NetworkMonitor: ObservableObject {
     static let shared = NetworkMonitor()
 
     private let monitor = NWPathMonitor()
-    private let queue = DispatchQueue.global(qos: .background)
+    private let queue   = DispatchQueue.global(qos: .background)
 
+    /// `true`, sobald `path.status == .satisfied`
     @Published var isConnected: Bool = false
+
+    /// `.wifi`, `.cellular` … **oder `nil`, wenn kein Netz vorhanden ist**
     @Published var connectionType: NWInterface.InterfaceType?
 
-    private init() {}
+    private init() { }
 
-    // MARK: Startet die Netzwerküberwachung
+    // MARK: - Netzwerküberwachung starten
     func startMonitoring() {
         monitor.pathUpdateHandler = { [weak self] path in
             DispatchQueue.main.async {
-                // Online/Offline-Status
-                self?.isConnected = (path.status == .satisfied)
+                guard let self = self else { return }
 
-                // Unterscheide Mobilfunk (teuer) vs. WLAN/Ethernet (günstig)
-                if path.isExpensive {
-                    // teure Verbindung = Mobilfunk (oder Hotspot über Mobilfunk)
-                    self?.connectionType = .cellular
-                } else {
-                    // günstige Verbindung = WLAN / Ethernet
-                    self?.connectionType = .wifi
-                }
+                // 1. Online/Offline-Status
+                self.isConnected = (path.status == .satisfied)
 
+                // 2. Verbindungstyp nur setzen, wenn eine Verbindung besteht
                 if path.status == .satisfied {
+                    // Teure Verbindung = Mobilfunk; sonst WLAN/Ethernet
+                    self.connectionType = path.isExpensive ? .cellular : .wifi
                     print("Netzwerkverbindung besteht. (isExpensive: \(path.isExpensive))")
                 } else {
+                    // Kein Netz → kein Verbindungstyp
+                    self.connectionType = nil
                     print("Keine Netzwerkverbindung.")
                 }
             }
         }
+
         monitor.start(queue: queue)
         print("Netzwerkmonitor gestartet.")
     }
 
-    /// Stoppt die Netzwerküberwachung
+    // MARK: - Netzwerküberwachung stoppen
     func stopMonitoring() {
         monitor.cancel()
         print("Netzwerkmonitor gestoppt.")
     }
-    
 }
-

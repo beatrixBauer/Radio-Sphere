@@ -13,16 +13,10 @@ import SwiftUI
 struct MainView: View {
     @State private var selectedTab = 0 // Speichert den aktiven Tab
     @ObservedObject private var manager = StationsManager.shared
-    @ObservedObject private var networkMonitor = NetworkMonitor.shared
+    @ObservedObject private var net = NetworkMonitor.shared
     @State private var activeStation: RadioStation?
     @State private var showNoConnectionAlert = false
-
-    init() {
-        if ProcessInfo.processInfo.arguments.contains("UITest_NoInternet") {
-            // Simuliere keine Internetverbindung, damit der Alert erscheint.
-            networkMonitor.isConnected = false
-        }
-    }
+    let message = NSLocalizedString("no_connection_message", comment: "")
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -73,19 +67,31 @@ struct MainView: View {
             )
         }
         // Netzwerkstatus beobachten: wenn die Verbindung verloren geht, Alert anzeigen
-        .onReceive(networkMonitor.$isConnected) { isConnected in
+        .onReceive(net.$isConnected) { isConnected in
             if !isConnected {
                 showNoConnectionAlert = true
             } else {
                 showNoConnectionAlert = false
             }
         }
-        .alert("Keine Internetverbindung", isPresented: $showNoConnectionAlert) {
-            Button("OK", role: .cancel) {
-                showNoConnectionAlert = false
+        .alert("Keine Internetverbindung",
+               isPresented: $showNoConnectionAlert) {
+            Button("Erneut prüfen") {
+                if net.isConnected {
+                    showNoConnectionAlert = false     // Netz da → schließen
+                } else {
+                    // sofort neu öffnen
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { //kurze Wartezeit, nach "Erneut prüfen" um Flackereffekt zu vermeiden
+                        if !net.isConnected {   // noch kein Netz?
+                            showNoConnectionAlert = true   // → Alert erneut anzeigen
+                        }
+                    }
+                }
             }
-        } message: {
-            Text("Für die Nutzung der RadioApp ist eine Internetverbindung notwendig. Bitte verbinde dich mit dem Internet.")
+        
+        }
+        message: {
+            Text(message)
         }
         .onChange(of: selectedTab) { newValue in
             print("Aktiver Tab gewechselt: \(newValue)")
@@ -99,8 +105,4 @@ struct MainView: View {
         }
         .preferredColorScheme(.dark)
     }
-}
-
-#Preview {
-    MainView()
 }
