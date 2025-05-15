@@ -38,5 +38,3 @@ Radio Sphere is being developed as part of a Bachelor’s thesis and is currentl
 ## Contact
 beatrix.bauer@gmail.com
 
-Questions or feedback?  
-Your Name • your.email@example.com
