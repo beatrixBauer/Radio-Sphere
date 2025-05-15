@@ -36,5 +36,6 @@ Radio Sphere does **not** collect or store any personally identifiable informati
 Radio Sphere is being developed as part of a Bachelor’s thesis and is currently distributed via TestFlight. An App Store release is planned.
 
 ## Contact
+Beatrix Bauer 
 beatrix.bauer@gmail.com
 
