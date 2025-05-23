@@ -98,9 +98,9 @@ class RadioAPI {
     // Ermittlung der verfügbaren Server von Radio-Browser (DE soll bevorzugt werden)
     func getRadioBrowserBaseURLs() -> [String] {
         let fallbackURLs = [
+            "https://de1.api.radio-browser.info",
             "https://de2.api.radio-browser.info",
-            "https://fi1.api.radio-browser.info/",
-            "https://at1.api.radio-browser.info"
+            "https://fi1.api.radio-browser.info/"
         ]
         let hostname: CFString = "all.api.radio-browser.info" as CFString
         var streamError = CFStreamError()

@@ -36,7 +36,7 @@ class DataManager {
         }
         
         // Wenn keine frische Datei im Documents-Verzeichnis vorhanden ist, wird die API-Anfrage ausgelöst.
-        if NetworkMonitor.shared.connectionType == .cellular {
+        if NetworkMonitor.shared.isExpensive == true {
             // Bei Mobilfunk: zuerst 5000 Sender laden
             api.fetchStations(offset: 0, limit: 5000) { [weak self] initialStations in
                 guard let self = self else { return }

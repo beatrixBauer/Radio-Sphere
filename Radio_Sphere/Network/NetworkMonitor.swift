@@ -20,6 +20,10 @@ final class NetworkMonitor: ObservableObject {
 
     /// `.wifi`, `.cellular` … **oder `nil`, wenn kein Netz vorhanden ist**
     @Published var connectionType: NWInterface.InterfaceType?
+    
+    // um auf Mobilfunkverbindungen zu reagieren
+    @Published var isExpensive: Bool? = nil
+
 
     private init() { }
 
@@ -29,16 +33,13 @@ final class NetworkMonitor: ObservableObject {
             DispatchQueue.main.async {
                 guard let self = self else { return }
 
-                // 1. Online/Offline-Status
                 self.isConnected = (path.status == .satisfied)
+                self.isExpensive = path.isExpensive           // ← HIER eingefügt
 
-                // 2. Verbindungstyp nur setzen, wenn eine Verbindung besteht
                 if path.status == .satisfied {
-                    // Teure Verbindung = Mobilfunk; sonst WLAN/Ethernet
                     self.connectionType = path.isExpensive ? .cellular : .wifi
                     print("Netzwerkverbindung besteht. (isExpensive: \(path.isExpensive))")
                 } else {
-                    // Kein Netz → kein Verbindungstyp
                     self.connectionType = nil
                     print("Keine Netzwerkverbindung.")
                 }
