@@ -244,7 +244,12 @@ extension StationsManager {
     func filterUniqueStationsAndSortByCountry(for category: RadioCategory) {
         // 1. Wie gehabt: filtern & Duplikate entfernen
         let filtered  = filterStations(for: category)
-        let unique    = filterUniqueStationsByName(filtered)
+        
+        // 1b  Filtern nach Breakz (gleiche Streams in unterschiedlichen URLS)
+        let dedupKeys  = filterUniqueStationsByDuplicateKey(filtered)
+        
+        // 1c Filter nach Name
+        let unique    = filterUniqueStationsByName(dedupKeys)
 
         // 2. Präferenz‑Country bestimmen
         let preferred: String = {
@@ -358,6 +363,19 @@ extension StationsManager {
 
         return combinedResults
     }
+    
+    /// Behalt pro duplicateKey genau EIN Objekt (den ersten)
+    private func filterUniqueStationsByDuplicateKey(_ list: [RadioStation]) -> [RadioStation] {
+        var seen = Set<String>()
+        return list.filter { st in
+            if let k = st.duplicateKey {
+                if seen.contains(k) { return false }
+                seen.insert(k)
+            }
+            return true          // Sender ohne duplicateKey nie unterdrücken
+        }
+    }
+
 
 }
 
@@ -697,66 +715,49 @@ extension StationsManager {
 // MARK: Metadaten Handling mit FRadioPlayer
 extension StationsManager : FRadioPlayerDelegate {
     /// Wird aufgerufen, wenn Metadaten sich ändern (Songtitel & Künstler)
-    func radioPlayer(_ player: FRadioPlayer, metadataDidChange artistName: String?, trackName: String?) {
+    func radioPlayer(_ player: FRadioPlayer,
+                     metadataDidChange artistName: String?,
+                     trackName: String?) {
         DispatchQueue.main.async {
-            // Speichere bisherige Werte
-            _ = self.currentArtist
-            _ = self.currentTrack
+            // ----------------- Artist ---------------------------------
+            let displayArtist: String = {
+                if let artist = artistName, !artist.isInvalidMeta {
+                    return artist.fixEncoding()
+                }
+                return self.currentStation?.name ?? "Unbekannter Sender"
+            }()
 
-            // Ungültige Werte, die manche Radiosender während Werbung oder Pausen senden
-            let invalidValues: Set<String> = ["true", "false", "unknown", "advertisement", "ads", "ad break"]
+            // ----------------- Track ----------------------------------
+            let displayTrack: String = {
+                if let track = trackName, !track.isInvalidMeta {
+                    return track.fixEncoding()
+                }
+                return NSLocalizedString("Jetzt läuft...", comment: "")
+            }()
 
-            // Gibberish-Muster, z. B. wenn der Text keine Leerzeichen enthält und länger als 20 Zeichen ist
-            func isLikelyGibberish(_ text: String) -> Bool {
-                let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
-                return !trimmed.contains(" ") && trimmed.count > 20
-            }
+            // 1) Nichts Neues? → abbrechen
+            guard self.currentArtist != displayArtist ||
+                  self.currentTrack  != displayTrack else { return }
 
-            // Hilfsfunktion: erkennt, ob der Text komplett in {} steht
-            func isWrappedInBraces(_ text: String) -> Bool {
-                let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
-                return trimmed.first == "{" && trimmed.last == "}"
-            }
+            // 2) Werte übernehmen
+            self.currentArtist = displayArtist
+            self.currentTrack  = displayTrack
+            print("Jetzt läuft: \(displayArtist) - \(displayTrack)")
 
-            // Bereinige Artist und Track (nur zum Vergleichen)
-            let cleanedArtist = artistName?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() ?? ""
-            let cleanedTrack  = trackName?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() ?? ""
-
-            // Standardwerte für Artist und Track
-            var displayArtist = self.currentStation?.name ?? "Unbekannter Sender"
-            var displayTrack  = NSLocalizedString("Jetzt läuft...", comment: "Fallback-Titel, wenn kein Trackname verfügbar ist")
-
-            // ARTIST-Logik
-            if cleanedArtist.contains("gzip")
-                || invalidValues.contains(cleanedArtist)
-                || (artistName != nil && isWrappedInBraces(artistName!)) {
-                // Fallback: use station name
-                displayArtist = self.currentStation?.name ?? "Unbekannter Sender"
-            } else if let artist = artistName, !artist.isEmpty {
-                displayArtist = artist.fixEncoding()
-            }
-
-            // TRACK-Logik
-            if cleanedTrack.contains("gzip")
-                || invalidValues.contains(cleanedTrack)
-                || (trackName != nil && isWrappedInBraces(trackName!))
-                || isLikelyGibberish(cleanedTrack) {
-                // displayTrack bleibt bei "Jetzt läuft..."
-            } else if let track = trackName, !track.isEmpty {
-                displayTrack = track.fixEncoding()
-            }
-
-            // Falls nichts Neues, abbrechen
-            if self.currentArtist == displayArtist && self.currentTrack == displayTrack {
+            // 3) Nur bei echtem Track (kein Fallback) Artwork holen
+            let fallback = NSLocalizedString("Jetzt läuft...", comment: "")
+            guard displayTrack != fallback else {
+                // wir sind noch im „Jetzt läuft…“-Fallback
                 return
             }
 
-            // Werte aktualisieren
-            self.currentArtist = displayArtist
-            self.currentTrack  = displayTrack
-            print("Jetzt läuft: \(self.currentArtist) - \(self.currentTrack)")
+            // 4) Zusätzlich: Roh-Track darf keine Invalid-Meta sein
+            if let raw = trackName, raw.isInvalidMeta {
+                // Server hat uns hier zwar was geliefert, aber es ist nutzlos
+                return
+            }
 
-            // Albumcover abrufen
+            // 5) ECHTER Song → Artwork abfragen
             self.fetchAlbumArtwork()
         }
     }

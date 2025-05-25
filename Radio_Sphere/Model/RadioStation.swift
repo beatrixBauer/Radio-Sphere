@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Foundation
 
 struct RadioStation: Identifiable, Codable, Equatable, Hashable {
     let id: String
@@ -133,3 +134,19 @@ struct StationImageView: View {
         .cornerRadius(10)
     }
 }
+
+extension RadioStation {
+    private static let excludedStations: Set<String> = [
+        "OS-Radio"
+    ]
+    
+    /// Host + Path, bei Rautemusik ohne stream-Nummer
+    var duplicateKey: String? {
+        guard let c = URLComponents(string: url), let host = c.host else { return nil }
+        let cleanHost = host.replacingOccurrences(of: #"\.stream\d+\."#,
+                                                  with: ".stream.",
+                                                  options: .regularExpression)
+        return (cleanHost + c.path).lowercased()    // z. B. rautemusik.stream.radiohost.de/breakz
+    }
+}
+

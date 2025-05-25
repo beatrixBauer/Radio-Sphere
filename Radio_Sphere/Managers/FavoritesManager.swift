@@ -53,5 +53,6 @@ class FavoritesManager: ObservableObject {
     // Favoriten aus UserDefaults laden
     private func loadFavorites() {
         favoriteStationIDs = UserDefaults.standard.stringArray(forKey: favoritesKey) ?? []
+        print(favoriteStationIDs)
     }
 }
