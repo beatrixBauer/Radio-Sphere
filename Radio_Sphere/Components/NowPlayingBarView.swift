@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-private let numBars = 5
+private let numBars = 7
 private let spacerWidthRatio: CGFloat = 0.2
 private let barWidthScaleFactor = 1 / (CGFloat(numBars) + CGFloat(numBars - 1) * spacerWidthRatio)
 
@@ -22,11 +22,15 @@ struct NowPlayingBarView: View {
             let barWidth = geo.widthScaled(barWidthScaleFactor)
             let spacerWidth = barWidth * spacerWidthRatio
             HStack(spacing: spacerWidth) {
-                ForEach(0..<numBars, id: \.self) { _ in
-                    Bar(minHeightFraction: 0.1, maxHeightFraction: 1, completion: animating ? 1 : 0)
-                        .fill(Color.white)
-                        .frame(width: barWidth)
-                        .animation(createAnimation(), value: animating)
+                ForEach(0..<numBars, id: \.self) { index in
+                    Bar(
+                        minHeightFraction: 0.1,
+                        maxHeightFraction: barMaxHeight(for: index),
+                        completion: animating ? 1 : 0
+                    )
+                    .fill(Color.white.opacity(0.9))
+                    .frame(width: barWidth)
+                    .animation(createAnimation(), value: animating)
                 }
             }
         }
@@ -35,9 +39,16 @@ struct NowPlayingBarView: View {
         }
     }
 
+    /// Liefert für die Mitte größere Werte, außen kleinere – sinusförmig von 0.4 bis 0.8
+    private func barMaxHeight(for index: Int) -> CGFloat {
+        let t = Double(index) / Double(numBars - 1)         // t = 0 ... 1
+        let curve = 0.4 + 0.6 * sin(.pi * t)                // Werte zwischen 0.4 (außen) und 0.8 (Mitte)
+        return CGFloat(curve)
+    }
+
     private func createAnimation() -> Animation {
         Animation
-            .easeInOut(duration: 0.5 + Double.random(in: -0.3...0.3))
+            .easeInOut(duration: 0.5 + Double.random(in: -0.2...0.2))
             .repeatForever(autoreverses: true)
             .delay(Double.random(in: 0...0.75))
     }

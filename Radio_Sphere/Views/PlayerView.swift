@@ -70,21 +70,6 @@ struct PlayerView: View {
 
                 }
                 .padding(20)  // gilt für Button‑HStack
-                .overlay(alignment: .trailing) {
-                    // immer sichtbare Play‑Indicator‑Logik
-                    Group {
-                        if manager.isPlaying {
-                            NowPlayingBarView()
-                        } else {
-                            Image(systemName: "waveform")
-                                .resizable()
-                                .scaledToFit()
-                                .foregroundColor(.gray)
-                        }
-                    }
-                    .frame(width: 20, height: 20)
-                    .padding(.horizontal, horizontalPadding)
-                }
 
                 // MARK: – MarqueeText
                 MarqueeText(
@@ -119,6 +104,39 @@ struct PlayerView: View {
                     }
                 }
                 .padding(.bottom, 10)
+                .overlay(alignment: .topTrailing) {
+                    // Immer sichtbare Play‑Indicator‑Logik
+                    Group {
+                        if manager.isPlaying {
+                            ZStack {
+                                // Material-Hintergrund, abgerundet
+                                RoundedRectangle(cornerRadius: 5)
+                                    .fill(.ultraThinMaterial)
+                                    .frame(width: 22, height: 22) // etwas größer als die Bars
+                                    .opacity(0.82)
+                                // Die Bars, gespiegelt übereinander
+                                VStack(spacing: 0) {
+                                    NowPlayingBarView()
+                                    NowPlayingBarView()
+                                        .scaleEffect(x: -1, y: -1)
+                                }
+                            }
+                        } else {
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 5)
+                                    .fill(.ultraThinMaterial)
+                                    .frame(width: 22, height: 22)
+                                    .opacity(0.82)
+                                Image(systemName: "waveform")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .padding(2)
+                            }
+                        }
+                    }
+                    .frame(width: 18, height: 20)
+                    .padding(2)
+                }
 
                 // MARK: – Volume Slider
                 VolumeSliderView()
@@ -212,5 +230,9 @@ struct PlayerView: View {
             }
         }
     }
+}
+
+#Preview {
+    SplashView()
 }
 
