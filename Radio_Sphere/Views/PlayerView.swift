@@ -64,10 +64,19 @@ struct PlayerView: View {
                                 .font(.title)
                                 .foregroundColor(.white.opacity(0.8))
                         }
+                        Spacer()
+                        Button {
+                            dismiss()
+                            manager.isMiniPlayerVisible = false
+                            if manager.isPlaying {
+                                manager.stopPlayback()
+                            }
+                        } label: {
+                            Image(systemName: "xmark.circle")
+                                .font(.title)
+                                .foregroundColor(.white.opacity(0.8))
+                        }
                     }
-
-                    Spacer()  // schiebt alles nach links
-
                 }
                 .padding(20)  // gilt für Button‑HStack
 
@@ -112,7 +121,7 @@ struct PlayerView: View {
                                 // Material-Hintergrund, abgerundet
                                 RoundedRectangle(cornerRadius: 5)
                                     .fill(.ultraThinMaterial)
-                                    .frame(width: 22, height: 22) // etwas größer als die Bars
+                                    .frame(width: 20, height: 20) // etwas größer als die Bars
                                     .opacity(0.82)
                                 // Die Bars, gespiegelt übereinander
                                 VStack(spacing: 0) {
@@ -135,7 +144,7 @@ struct PlayerView: View {
                         }
                     }
                     .frame(width: 18, height: 20)
-                    .padding(2)
+                    .padding(5)
                 }
 
                 // MARK: – Volume Slider

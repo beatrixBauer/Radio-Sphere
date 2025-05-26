@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-private let numBars = 7
+private let numBars = 8
 private let spacerWidthRatio: CGFloat = 0.2
 private let barWidthScaleFactor = 1 / (CGFloat(numBars) + CGFloat(numBars - 1) * spacerWidthRatio)
 
@@ -28,7 +28,7 @@ struct NowPlayingBarView: View {
                         maxHeightFraction: barMaxHeight(for: index),
                         completion: animating ? 1 : 0
                     )
-                    .fill(Color.white.opacity(0.9))
+                    .fill(Color.white.opacity(0.8))
                     .frame(width: barWidth)
                     .animation(createAnimation(), value: animating)
                 }

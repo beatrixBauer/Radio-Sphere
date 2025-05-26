@@ -50,7 +50,7 @@ struct MainView: View {
                     .tag(3)
             }
             // MiniPlayerView nur anzeigen, wenn aktiv und nicht in PlayerView
-            if manager.isPlaying, !manager.isInPlayerView, manager.currentStation != nil {
+            if manager.isMiniPlayerVisible, !manager.isInPlayerView, manager.currentStation != nil {
                 MiniPlayerView {
                     activeStation = manager.currentStation
                 }

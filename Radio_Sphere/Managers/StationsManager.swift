@@ -53,6 +53,7 @@ class StationsManager: ObservableObject {
     @Published var sortMode: SortMode = .grouped                                        // Sortier-Reihenfolge nach Alphabeth mit verschieden Zuständen
     
     // Beobachter
+    @Published var isMiniPlayerVisible: Bool = false                                    // Steuert die Sichtbarkeit des MiniPlayers
     @Published var isInPlayerView: Bool = false                                         // Beobachtung, ob der Nutzer in der PlayerView ist
     @Published var filtersWereReset: Bool = false                                       // Beobachtung des Filter-Sortier-Status
     @Published var userDidPause: Bool = false                                           // Bobachtung, ob der User den Player pausiert hat
@@ -602,6 +603,7 @@ extension StationsManager {
     /// Stoppt die Wiedergabe
     func stopPlayback() {
         player.stop()
+        isMiniPlayerVisible = false
         resetMetadata()
     }
 
@@ -857,6 +859,12 @@ extension StationsManager : FRadioPlayerDelegate {
         print("Playback State geändert: \(state)")
         DispatchQueue.main.async {
             self.isPlaying = (state == .playing)
+            if state == .playing || state == .paused {
+                self.isMiniPlayerVisible = true
+            } else {
+                self.isMiniPlayerVisible = false
+            }
+            print("Status isPlaying: \(self.isPlaying) \nStatus isMiniPlayerVisible: \(self.isMiniPlayerVisible)")
         }
     }
 

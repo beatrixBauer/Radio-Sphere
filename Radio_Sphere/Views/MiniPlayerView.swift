@@ -13,7 +13,7 @@ struct MiniPlayerView: View {
     @State private var showRemainingTime = false
 
     var body: some View {
-        if manager.isPlaying, !manager.isInPlayerView, let station = manager.currentStation {
+        if manager.isMiniPlayerVisible, !manager.isInPlayerView, let station = manager.currentStation {
             HStack {
                 // Album-/Senderbild (immer sichtbar)
                 AsyncImage(url: manager.currentArtworkURL) { image in
@@ -72,13 +72,25 @@ struct MiniPlayerView: View {
                  }
 
                 // Pause-Button
-                Button(action: {
-                    manager.pausePlayback()
-                }) {
-                    Image(systemName: "pause.fill")
-                        .resizable()
-                        .frame(width: 25, height: 25)
-                        .foregroundColor(.white)
+                Button {
+                    if manager.isPlaying && manager.currentStation == station {
+                        manager.pausePlayback()
+                    } else {
+                        manager.set(station: station)
+                    }
+                } label: {
+                    Image(systemName:
+                        manager.isPlaying && manager.currentStation == station
+                        ? "pause.fill"
+                        : "play.fill"
+                    )
+                    .resizable()
+                    .frame(
+                        width: 25,
+                        height: 25
+                    )
+                    .foregroundColor(.white)
+                    .shadow(radius: 4)
                 }
                 .padding(.horizontal, 10)
             }
