@@ -15,7 +15,20 @@
       "comment" : "Timerminuten"
     },
     "Abbrechen" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abbrechen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
+          }
+        }
+      }
     },
     "Abc" : {
       "comment" : "Alphabetisch sortieren",
@@ -52,7 +65,20 @@
       }
     },
     "Alle Filter zurücksetzen" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle Filter zurücksetzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset all Filters"
+          }
+        }
+      }
     },
     "category_afrobeat" : {
       "comment" : "Afrobeat",
@@ -600,10 +626,38 @@
       }
     },
     "Land suchen" : {
-
+      "comment" : "Land suchen",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Land suchen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search Country"
+          }
+        }
+      }
     },
     "Land wählen" : {
-
+      "comment" : "Land wählen",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Land wählen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select Country"
+          }
+        }
+      }
     },
     "Leider nichts gefunden" : {
       "comment" : "SearchView Ergebnisse",
@@ -659,7 +713,21 @@
       }
     },
     "Reset" : {
-
+      "comment" : "Reset",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset"
+          }
+        }
+      }
     },
     "Sender suchen" : {
       "comment" : "Sender suchen",
