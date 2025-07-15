@@ -2,11 +2,8 @@
 //  SortMode.swift
 //  Radio Sphere
 //
-//  Created by Beatrix Bauer on 18.04.25.
-//
 
-
-// SortMode.swift
+// MARK: Abc-Sortierlogik
 
 import Foundation
 

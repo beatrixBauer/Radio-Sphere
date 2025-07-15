@@ -2,45 +2,89 @@
 //  RecentsManagerTests.swift
 //  Radio_Sphere
 //
-//  Created by Beatrix Bauer on 06.05.25.
-//
+// Test Verlaufsverwaltung
 
 import XCTest
 @testable import Radio_Sphere
 
 final class RecentsManagerTests: XCTestCase {
 
+    /// Merkt sich alle erfolgreich durchgelaufenen Test-Cases dieser Klasse
+    private static var passedTests: [String] = []
+
+    // MARK: - pro Test-Case
+
     override func setUp() {
         super.setUp()
-        // Sicherstellen, dass wir mit einer leeren Liste starten
+        // Sicherstellen, dass wir stets mit einer leeren Liste starten
         RecentsManager.shared.clearRecents()
     }
 
-    func testAddRecentStation() {
+    override func tearDown() {
+        defer { super.tearDown() }
+        // Wenn dieser Test fehlerfrei war, merken wir uns seinen Namen
+        if let run = testRun,
+           run.failureCount == 0,
+           run.unexpectedExceptionCount == 0 {
+            Self.passedTests.append(name)
+        }
+    }
+
+    // MARK: - einmal nach allen Tests dieser Klasse
+
+    override class func tearDown() {
+        defer { super.tearDown() }
+        print("\nAlle Tests bestanden (\(passedTests.count) Tests):")
+        for testName in passedTests {
+            print(" • \(testName)")
+        }
+    }
+
+    // MARK: - Tests
+
+    func testAddStationAtBeginning() {
         let manager = RecentsManager.shared
 
-        // Füge einen Sender hinzu und überprüfe, ob er an erster Stelle steht
+        // Station 1 hinzufügen
         manager.addRecentStation("station1")
-        XCTAssertEqual(manager.recentStationIDs.first, "station1", "Der Sender sollte an erster Stelle stehen.")
+        XCTAssertEqual(manager.recentStationIDs, ["station1"],
+                       "Nach Hinzufügen von station1 muss die Liste genau [\"station1\"] sein.")
 
-        // Füge denselben Sender erneut hinzu und erwarte, dass keine Duplikate entstehen
-        manager.addRecentStation("station1")
-        XCTAssertEqual(manager.recentStationIDs.count, 1, "Es dürfen keine doppelten Einträge entstehen.")
+        // Station 2 hinzufügen → station2 muss an den Anfang
+        manager.addRecentStation("station2")
+        XCTAssertEqual(manager.recentStationIDs.first, "station2",
+                       "Nach Hinzufügen von station2 muss station2 an erster Stelle stehen.")
+        XCTAssertEqual(manager.recentStationIDs.dropFirst(), ["station1"],
+                       "station1 muss nun an zweiter Stelle stehen.")
+    }
 
-        // Füge mehrere Sender hinzu und teste, ob das Maximum (20) eingehalten wird
-        for i in 2...25 {
+    func testMaxTwentyStations() {
+        let manager = RecentsManager.shared
+
+        // 21 verschiedene Stationen hinzufügen
+        for i in 1...21 {
             manager.addRecentStation("station\(i)")
         }
-        XCTAssertEqual(manager.recentStationIDs.count, 20, "Die Liste darf nicht mehr als 20 Einträge enthalten.")
-    }
 
-    func testClearRecents() {
-        let manager = RecentsManager.shared
-        manager.addRecentStation("station1")
-        manager.addRecentStation("station2")
-        XCTAssertFalse(manager.recentStationIDs.isEmpty, "Die Liste sollte Einträge enthalten.")
+        // Es dürfen nur 20 Einträge existieren
+        XCTAssertEqual(manager.recentStationIDs.count, 20,
+                       "Die Liste darf nicht mehr als 20 Einträge enthalten.")
 
-        manager.clearRecents()
-        XCTAssertTrue(manager.recentStationIDs.isEmpty, "Die Liste sollte geleert worden sein.")
+        // station21 muss an erster Stelle stehen
+        XCTAssertEqual(manager.recentStationIDs.first, "station21",
+                       "Neu hinzugefügte station21 muss an erster Stelle stehen.")
+
+        // station1 (die älteste) darf nicht mehr in der Liste sein
+        XCTAssertFalse(manager.recentStationIDs.contains("station1"),
+                      "station1 muss als ältester Eintrag entfernt worden sein.")
+
+        // station2 muss nun der letzte Eintrag sein
+        XCTAssertEqual(manager.recentStationIDs.last, "station2",
+                       "Nach Entfernen von station1 ist station2 der älteste verbleibende und damit letzter Eintrag.")
     }
 }
+
+
+
+
+

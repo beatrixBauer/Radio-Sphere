@@ -2,8 +2,7 @@
 //  RadioStation.swift
 //  Radio_Sphere
 //
-//  Created by Beatrix Bauer on 01.04.25.
-//
+// MARK: Modell Radiostation
 
 import SwiftUI
 import Foundation
@@ -149,4 +148,42 @@ extension RadioStation {
         return (cleanHost + c.path).lowercased()    // z. B. rautemusik.stream.radiohost.de/breakz
     }
 }
+
+// zu Testzwecken
+extension RadioStation {
+    init(
+        id: String,
+        name: String,
+        url: String,
+        country: String,
+        countrycode: String,
+        state: String,
+        language: String,
+        tags: String,
+        lastcheckok: Int,
+        imageURL: String,
+        codec: String,
+        clickcount: Int,
+        hasExtendedInfo: Bool,
+        geo_lat: Double,
+        geo_long: Double
+    ) {
+        self.id = id
+        self.name = name
+        self.url = url
+        self.country = country
+        self.countrycode = countrycode
+        self.state = state
+        self.language = language
+        self.tags = tags
+        self.lastcheckok = lastcheckok
+        self.imageURL = imageURL
+        self.codec = codec
+        self.clickcount = clickcount
+        self.hasExtendedInfo = hasExtendedInfo
+        self.geo_lat = geo_lat
+        self.geo_long = geo_long
+    }
+}
+
 

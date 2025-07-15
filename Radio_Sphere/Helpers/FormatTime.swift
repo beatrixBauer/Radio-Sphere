@@ -2,8 +2,7 @@
 //  FormatTime.swift
 //  Radio Sphere
 //
-//  Created by Beatrix Bauer on 17.04.25.
-//
+
 import Foundation
 
 extension Int {

@@ -2,8 +2,7 @@
 //  StationsManagerPlayerTests.swift
 //  Radio_Sphere
 //
-//  Created by Beatrix Bauer on 06.05.25.
-//
+// Test der Player-Funkionen
 
 import XCTest
 @testable import Radio_Sphere

@@ -1,9 +1,6 @@
 //
 //  ActionButton.swift
 //  Radio_Sphere
-//
-//  Created by Beatrix Bauer on 17.04.25.
-//
 
 import SwiftUI
 
@@ -14,14 +11,17 @@ struct ActionButton: View {
     let systemName: String
     let action: () -> Void
     let buttonSize: CGFloat
+    let identifier: String?
 
     @State private var isPressed: Bool = false
 
     // buttonSize als Parameter
-    init(systemName: String, buttonSize: CGFloat = 30, action: @escaping () -> Void) {
+    init(systemName: String, buttonSize: CGFloat = 30, identifier: String? = nil, action: @escaping () -> Void) {
         self.systemName = systemName
         self.buttonSize = buttonSize
+        self.identifier = identifier
         self.action = action
+        
     }
 
     var body: some View {

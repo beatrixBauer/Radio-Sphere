@@ -2,8 +2,7 @@
 //  StubURLProtocol.swift
 //  Radio_Sphere
 //
-//  Created by Beatrix Bauer on 06.05.25.
-//
+// simulierte API-Antwort
 
 import XCTest
 @testable import Radio_Sphere
@@ -50,7 +49,7 @@ class StubURLProtocol: URLProtocol {
 
 final class RadioAPITests: XCTestCase {
 
-    // Wir konfigurieren eine eigene URLSession-Konfiguration, die den StubURLProtocol nutzt.
+    // Konfiguration einer eigenen URLSession-Konfiguration, die den StubURLProtocol nutzt.
     var session: URLSession!
 
     override func setUp() {
@@ -161,4 +160,5 @@ final class RadioAPITests: XCTestCase {
         }
         waitForExpectations(timeout: 5)
     }
+    
 }

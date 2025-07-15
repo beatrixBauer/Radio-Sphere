@@ -2,8 +2,6 @@
 //  SearchView.swift
 //  Radio_Sphere
 //
-//  Created by Beatrix Bauer on 21.04.25.
-//
 
 import SwiftUI
 

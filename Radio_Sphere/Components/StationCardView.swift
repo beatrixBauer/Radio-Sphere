@@ -2,8 +2,6 @@
 //  StationCardView.swift
 //  Radio_Sphere
 //
-//  Created by Beatrix Bauer on 02.04.25.
-//
 
 import SwiftUI
 

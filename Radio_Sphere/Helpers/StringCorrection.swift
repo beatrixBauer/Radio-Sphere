@@ -1,10 +1,9 @@
 //
 //  StringCorrection.swift
 //  Radio_Sphere
-//  Created by Beatrix Bauer on 02.04.25.
-//
 
-import Foundation            // ← falls noch nicht vorhanden
+
+import Foundation  
 
 // MARK: dient der richtigen Darstellung der Metadaten
 // Handling von Sonderzeichen für die richtige Darstellung der Metadaten,

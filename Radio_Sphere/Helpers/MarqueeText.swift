@@ -2,8 +2,6 @@
 //  MarqueeText.swift
 //  Radio_Sphere
 //
-//  Created by Beatrix Bauer on 19.04.25.
-//
 
 import SwiftUI
 

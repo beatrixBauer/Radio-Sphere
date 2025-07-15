@@ -2,14 +2,13 @@
 //  SleepTimerView.swift
 //  Radio_Sphere
 //
-//  Created by Beatrix Bauer on 17.04.25.
-//
+
 
 import SwiftUI
 
 struct SleepTimerView: View {
     @StateObject private var manager = StationsManager.shared
-    let sleepDurations = [5, 10, 15, 30, 60]  // Auswahl in Minuten
+    let sleepDurations = [5, 10, 15, 20, 30, 60]  // Auswahl in Minuten
     var iconSize: CGFloat = 30                // Icon‑Größe
 
     var body: some View {

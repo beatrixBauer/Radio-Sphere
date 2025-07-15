@@ -2,7 +2,7 @@
 //  DataManager.swift
 //  Radio_Sphere
 //
-//  Created by Beatrix Bauer on 07.04.25.
+
 
 import Foundation
 

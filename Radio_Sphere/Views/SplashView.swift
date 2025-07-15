@@ -3,6 +3,8 @@
 //  Radio_Sphere
 //
 
+// MARK: Ruft die Startanimation auf und prüft die Internetverbindung
+
 import SwiftUI
 
 struct SplashView: View {

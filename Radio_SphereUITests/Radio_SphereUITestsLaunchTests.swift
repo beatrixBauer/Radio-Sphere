@@ -2,8 +2,7 @@
 //  Radio_SphereUITestsLaunchTests.swift
 //  Radio_SphereUITests
 //
-//  Created by Beatrix Bauer on 01.04.25.
-//
+// Launchtest
 
 import XCTest
 

@@ -1,0 +1,36 @@
+{
+  "configurations" : [
+    {
+      "id" : "7EC00200-4860-4DC9-986F-E225F4ABD5A5",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:Radio Sphere.xcodeproj",
+      "identifier" : "81A791D62D68853900004664",
+      "name" : "Radio Sphere"
+    }
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:Radio Sphere.xcodeproj",
+        "identifier" : "81A791E62D68853B00004664",
+        "name" : "Radio SphereTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:Radio Sphere.xcodeproj",
+        "identifier" : "817B8A3A2E19433200C8200C",
+        "name" : "Radio_SphereUITests"
+      }
+    }
+  ],
+  "version" : 1
+}

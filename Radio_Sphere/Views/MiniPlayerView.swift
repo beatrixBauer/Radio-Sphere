@@ -2,8 +2,7 @@
 //  MiniPlayerView.swift
 //  Radio_Sphere
 //
-//  Created by Beatrix Bauer on 20.04.25.
-//
+// MARK: MiniPlayer zur Stream-Steuerung von außerhalb der Player-View
 
 import SwiftUI
 

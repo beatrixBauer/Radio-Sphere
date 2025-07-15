@@ -2,8 +2,7 @@
 //  LikeButton.swift
 //  Radio_Sphere
 //
-//  Created by Beatrix Bauer on 15.04.25.
-//
+
 
 import SwiftUI
 

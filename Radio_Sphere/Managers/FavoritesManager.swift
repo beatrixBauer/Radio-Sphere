@@ -2,8 +2,7 @@
 //  FavoritesManager.swift
 //  Radio_Sphere
 //
-//  Created by Beatrix Bauer on 12.04.25.
-//
+
 
 import Foundation
 

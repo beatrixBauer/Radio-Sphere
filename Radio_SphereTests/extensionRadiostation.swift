@@ -2,8 +2,7 @@
 //  extensionRadiostation.swift
 //  Radio_Sphere
 //
-//  Created by Beatrix Bauer on 06.05.25.
-//
+// Zur Simulation von Stations-Aufrufen
 
 extension RadioStation {
     init(testID: String, testName: String, testTags: String, testCountry: String, testCountryCode: String) {

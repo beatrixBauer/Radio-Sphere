@@ -1,8 +1,21 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "%@, %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@, %2$@"
+          }
+        }
+      }
+    },
     "%lld Minuten" : {
       "comment" : "Timerminuten"
+    },
+    "Abbrechen" : {
+
     },
     "Abc" : {
       "comment" : "Alphabetisch sortieren",
@@ -37,6 +50,9 @@
           }
         }
       }
+    },
+    "Alle Filter zurücksetzen" : {
+
     },
     "category_afrobeat" : {
       "comment" : "Afrobeat",
@@ -567,6 +583,7 @@
     },
     "Land" : {
       "comment" : "Land",
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -581,6 +598,12 @@
           }
         }
       }
+    },
+    "Land suchen" : {
+
+    },
+    "Land wählen" : {
+
     },
     "Leider nichts gefunden" : {
       "comment" : "SearchView Ergebnisse",
@@ -634,6 +657,9 @@
           }
         }
       }
+    },
+    "Reset" : {
+
     },
     "Sender suchen" : {
       "comment" : "Sender suchen",
@@ -699,6 +725,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Stop Timer"
+          }
+        }
+      }
+    },
+    "TipToStartPlaying" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tippen, um den Stream zu dieser Station zu starten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap to start streaming this station"
           }
         }
       }

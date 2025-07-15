@@ -2,8 +2,6 @@
 //  MockURLProtocol.swift
 //  Radio_Sphere
 //
-//  Created by Beatrix Bauer on 07.05.25.
-//
 
 import XCTest
 @testable import Radio_Sphere

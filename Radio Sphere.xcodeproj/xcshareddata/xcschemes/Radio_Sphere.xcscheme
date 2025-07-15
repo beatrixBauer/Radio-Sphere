@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1630"
+   LastUpgradeVersion = "1640"
    version = "1.7">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -27,8 +27,13 @@
       buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
-      shouldUseLaunchSchemeArgsEnv = "YES"
-      shouldAutocreateTestPlan = "YES">
+      shouldUseLaunchSchemeArgsEnv = "YES">
+      <TestPlans>
+         <TestPlanReference
+            reference = "container:Radio_Sphere.xctestplan"
+            default = "YES">
+         </TestPlanReference>
+      </TestPlans>
       <Testables>
          <TestableReference
             skipped = "NO"
@@ -49,6 +54,31 @@
                BlueprintIdentifier = "81A791F02D68853B00004664"
                BuildableName = "Radio SphereUITests.xctest"
                BlueprintName = "Radio SphereUITests"
+               ReferencedContainer = "container:Radio Sphere.xcodeproj">
+            </BuildableReference>
+            <SkippedTests>
+               <Test
+                  Identifier = "Radio_SphereUITestsLaunchTests">
+               </Test>
+               <Test
+                  Identifier = "Radio_SphereUITestsLaunchTests/testLaunch()">
+               </Test>
+               <Test
+                  Identifier = "SplashViewUITests">
+               </Test>
+               <Test
+                  Identifier = "SplashViewUITests/testSplashViewDisplaysAppName()">
+               </Test>
+            </SkippedTests>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "817B8A3A2E19433200C8200C"
+               BuildableName = "Radio_SphereUITests.xctest"
+               BlueprintName = "Radio_SphereUITests"
                ReferencedContainer = "container:Radio Sphere.xcodeproj">
             </BuildableReference>
          </TestableReference>

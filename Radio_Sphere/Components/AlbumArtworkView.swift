@@ -1,11 +1,8 @@
 //
 //  AlbumArtworkView.swift
 //  Radio_Sphere
-//
-//  Created by Beatrix Bauer on 21.04.25.
-//
 
-/// lädt das Sender-Logo, falls vorhanden und nutzt andernfalls einen Platzhalter
+// lädt das Sender-Logo, falls vorhanden und nutzt andernfalls einen Platzhalter
 
 import SwiftUI
 

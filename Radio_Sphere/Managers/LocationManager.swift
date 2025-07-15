@@ -2,8 +2,6 @@
 //  LocationManager.swift
 //  Radio_Sphere
 //
-//  Created by Beatrix Bauer on 13.04.25.
-//
 
 import Foundation
 import CoreLocation
@@ -92,7 +90,7 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     }
 
     // Filtert Radiosender basierend auf der Entfernung zum aktuellen Standort (ohne Sortierung)
-    func filterStationsByProximity(_ stations: [RadioStation], maxDistance: Double = 100000.0) -> [RadioStation] {
+    func filterStationsByProximity(_ stations: [RadioStation], maxDistance: Double = 50000.0) -> [RadioStation] {
         guard let userLocation = currentLocation else {
             print("Standort nicht verfügbar")
             return stations

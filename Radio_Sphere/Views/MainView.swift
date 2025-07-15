@@ -2,8 +2,7 @@
 //  MainView.swift
 //  Radio_Sphere
 //
-//  Created by Beatrix Bauer on 20.04.25.
-//
+
 
 import SwiftUI
 
@@ -22,6 +21,7 @@ struct MainView: View {
         ZStack(alignment: .bottom) {
             TabView(selection: $selectedTab) {
                 ContentView()
+                    .accessibilityIdentifier("tab_Hörwelten")
                     .tabItem {
                         Image(selectedTab == 0 ? "houseFill" : "houseEmpty")
                         Text("Hörwelten")
@@ -29,6 +29,7 @@ struct MainView: View {
                     .tag(0)
 
                 SearchView()
+                    .accessibilityIdentifier("tab_Suche")
                     .tabItem {
                         Image(selectedTab == 1 ? "searchSparkle" : "searchEmpty")
                         Text("Suche")
@@ -36,6 +37,7 @@ struct MainView: View {
                     .tag(1)
 
                 StationsView(category: RadioCategory.favorites)
+                    .accessibilityIdentifier("tab_Favoriten")
                     .tabItem {
                         Image(selectedTab == 2 ? "heartSquareFill" : "heartSquare")
                         Text("Favoriten")
@@ -43,6 +45,7 @@ struct MainView: View {
                     .tag(2)
 
                 StationsView(category: RadioCategory.recent)
+                    .accessibilityIdentifier("tab_Verlauf")
                     .tabItem {
                         Image(selectedTab == 3 ? "recentFill" : "recentEmpty")
                         Text("zuletzt gehört")
@@ -95,8 +98,8 @@ struct MainView: View {
         }
         .onChange(of: selectedTab) { newValue in
             print("Aktiver Tab gewechselt: \(newValue)")
-            manager.allowFilterReset()
-            manager.resetFilters()
+            //manager.allowFilterReset()
+            //manager.resetFilters()
         }
         .tint(.white)
         .environment(\.selectedTab, $selectedTab)

@@ -2,7 +2,7 @@
 //  StationsView.swift
 //  Radio_Sphere
 //
-//  Created by Beatrix Bauer on 01.04.25.
+
 
 import SwiftUI
 
@@ -22,6 +22,32 @@ struct StationsView: View {
         // soll der Picker angezeigt werden.
         return manager.getAvailableCountries(for: category).count > 1
     }
+    
+    @State private var isShowingCountrySheet = false
+    
+    // MARK: - Filter State
+    private var activeCountry: String {
+        manager.selectedCountry
+    }
+    private var isCountryFilterActive: Bool {
+        activeCountry != "Alle"
+    }
+    private var sheetCountries: [String] {
+        isCountryFilterActive
+            ? [activeCountry]
+            : manager.getAvailableCountries(for: category)
+    }
+    
+    // MARK: - Sort State
+    private var isSortActive: Bool {
+        manager.sortMode != .grouped
+    }
+    
+    /// true, wenn irgendein Filter (Land oder Sortierung) aktiv ist
+    private var isAnyFilterActive: Bool {
+        manager.selectedCountry != "Alle" || manager.sortMode != .grouped
+    }
+
 
     var body: some View {
         NavigationStack {
@@ -78,6 +104,28 @@ struct StationsView: View {
                         category: category // die aktuelle Kategorie übergeben
                     )
                 }
+                // 1) Reset-Filters Button
+                if isAnyFilterActive {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button {
+                            manager.allowFilterReset()
+                            manager.resetFilters()
+                            updateFilteredStations()
+                        } label: {
+                            Text("Reset")
+                              .font(.caption)
+                              .foregroundColor(.goldorange)               // Textfarbe
+                              .padding(.horizontal, 8)                      // Innenabstand links/rechts
+                              .padding(.vertical, 4)                        // Innenabstand oben/unten
+                              .overlay(                                     // Rahmen drumherum
+                                RoundedRectangle(cornerRadius: 6)
+                                  .stroke(Color.goldorange, lineWidth: 1)
+                              )
+                        }
+                        .help("Alle Filter zurücksetzen")
+                    }
+                }
+                
                 ToolbarItem(placement: .navigationBarTrailing) {
                   Button {
                     manager.sortMode = manager.sortMode.next
@@ -85,26 +133,33 @@ struct StationsView: View {
                   } label: {
                     HStack(spacing: 4) {
                         Text("Abc")
+                            .font(.callout)
                       Image(systemName: manager.sortMode.iconName)
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 16, height: 16)
                     }
                     .font(.body)
+                    .foregroundColor(isSortActive ? .goldorange : .primary)
                   }
                 }
                 // Picker-ToolbarItem wird nur angefügt, wenn shouldShowCountryPicker true ist.
                 if shouldShowCountryPicker {
                     ToolbarItem(placement: .topBarTrailing) {
-                        Menu {
-                            Picker("Land", selection: $manager.selectedCountry) {
-                                Text("Alle").tag("Alle")
-                                ForEach(manager.getAvailableCountries(for: category), id: \.self) { country in
-                                    Text(country).tag(country)
-                                }
-                            }
+                        Button {
+                            isShowingCountrySheet = true
                         } label: {
-                            Image(systemName: "slider.horizontal.3")
+                            Image(systemName: isCountryFilterActive ? "slider.horizontal.2.square" : "slider.horizontal.3")
+                                .foregroundColor(isCountryFilterActive ? .goldorange : .primary)
                         }
                     }
                 }
+            }
+            .sheet(isPresented: $isShowingCountrySheet) {
+                CountryPickerSheet(
+                    countries: sheetCountries,
+                    selectedCountry: $manager.selectedCountry
+                )
             }
             .tint(.white)
         }

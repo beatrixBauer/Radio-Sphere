@@ -2,8 +2,8 @@
 //  GlobeView.swift
 //  Radio_Sphere
 //
-//  Created by Beatrix Bauer on 16.04.25.
-//
+
+// MARK: Startanimation Globus
 
 import SwiftUI
 

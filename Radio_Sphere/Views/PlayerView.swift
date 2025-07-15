@@ -2,8 +2,6 @@
 //  StationDetailView.swift
 //  Radio_Sphere
 //
-//  Created by Beatrix Bauer on 02.04.25.
-//
 
 import SwiftUI
 
@@ -76,6 +74,7 @@ struct PlayerView: View {
                                 .font(.title)
                                 .foregroundColor(.white.opacity(0.8))
                         }
+                        .accessibilityIdentifier("stopButton")
                     }
                 }
                 .padding(20)  // gilt für Button‑HStack
@@ -97,6 +96,7 @@ struct PlayerView: View {
                         frameWidth: artwortSize,
                         frameHeight: artwortSize
                     )
+                    .accessibilityIdentifier("ArtworkImage")
                     if manager.isBuffering {
                         ProgressView()
                             .progressViewStyle(CircularProgressViewStyle(tint: .white))
@@ -152,8 +152,8 @@ struct PlayerView: View {
 
                 // MARK: – Track & Artist
                 VStack(spacing: 2) {
-                    Text(manager.currentTrack.fixEncoding())
-                    Text(manager.currentArtist.fixEncoding())
+                    Text(manager.currentTrack.fixEncoding()).accessibilityIdentifier("TrackLabel")
+                    Text(manager.currentArtist.fixEncoding()).accessibilityIdentifier("ArtistLabel")
                 }
                 .font(mediumFont)
                 .fontWeight(.semibold)
@@ -163,7 +163,9 @@ struct PlayerView: View {
                 // MARK: – Playback Controls
                 HStack(spacing: horizontalSpacing) {
                     ActionButton(systemName: "backward.fill",
-                                 buttonSize: actionButtonSize) {
+                                 buttonSize: actionButtonSize,
+                                 identifier: "previousButton"
+                    ) {
                         manager.setPrevious()
                     }
 
@@ -191,9 +193,17 @@ struct PlayerView: View {
                         )
                         .shadow(radius: 4)
                     }
+                    .accessibilityIdentifier(
+                        manager.isPlaying && manager.currentStation == station
+                        ? "pauseButton"
+                        : "playButton"
+                    )
 
                     ActionButton(systemName: "forward.fill",
-                                 buttonSize: actionButtonSize) {
+                                 buttonSize: actionButtonSize,
+                                 identifier: "nextButton"
+                    
+                    ) {
                         manager.setNext()
                     }
                 }

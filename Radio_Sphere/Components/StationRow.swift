@@ -2,8 +2,6 @@
 //  StationRow.swift
 //  Radio_Sphere
 //
-//  Created by Beatrix Bauer on 21.04.25.
-//
 
 import SwiftUI
 
@@ -21,6 +19,7 @@ struct StationRow: View {
         // Erzeugt eine PlayerView als Variable
         // Das vorherige Entpacken verhindert, dass die View zuviel rechnen muss und abstürzt
 
+        print("PlayerView init → Station: \(station.decodedName), Kategorie: \(categoryDisplayName)")
         let playerView = PlayerView(
             station: station,
             filteredStations: filteredStations,
@@ -30,6 +29,10 @@ struct StationRow: View {
 
         return NavigationLink(destination: playerView) {
             StationCardView(station: station)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel("\(station.decodedName), \(categoryDisplayName)")
+                .accessibilityHint("TipToStartPlaying")
+                .accessibilityAddTraits(.isButton)
         }
         .activeRowBackground(isActive: isActive)
         .background(Color.clear)

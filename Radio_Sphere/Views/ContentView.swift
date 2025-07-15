@@ -2,8 +2,7 @@
 //  ContentView.swift
 //  Radio_Sphere
 //
-//  Created by Beatrix Bauer on 04.04.25.
-//
+// MARK: Anzeige der Kategorien-Kacheln
 
 import SwiftUI
 
@@ -29,15 +28,16 @@ struct ContentView: View {
                             CategoryTile(title: category.displayName,
                                          iconName: category.iconName)
                         }
+                        .accessibilityIdentifier("category_\(category.rawValue.replacingOccurrences(of: " ", with: ""))")
                     }
                 }
                 .padding()
                 .padding(.bottom, 50)
             }
-            .onDisappear {
+           /* .onDisappear {
                 manager.allowFilterReset()
                 manager.resetFilters()
-            }
+            }*/
             .navigationTitle(LocalizedStringKey("Hörwelten"))
             .applyBackgroundGradient()
         }

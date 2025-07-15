@@ -2,8 +2,7 @@
 //  iTunesAPI.swift
 //  Radio_Sphere
 //
-//  Created by Beatrix Bauer on 22.04.25.
-//
+
 
 import Foundation
 

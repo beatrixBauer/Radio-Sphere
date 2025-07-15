@@ -2,8 +2,6 @@
 //  StationsManager.swift
 //  Radio_Sphere
 //
-//  Created by Beatrix Bauer on 02.04.25.
-//
 
 import SwiftUI
 import FRadioPlayer
@@ -17,6 +15,21 @@ class StationsManager: ObservableObject {
     private let player = FRadioPlayer.shared                                            // Zugriff auf FRadioPlayer-Funktionen
     private var searchCancellable: AnyCancellable?                                      // SuchText-Variable
     private var sleepTimer: Timer?                                                      // Variable für Sleeptimer
+   
+    // MARK: – Performance-Hooks für Tests
+    /// Wird nach dem Eintreffen des ersten .playing-States aufgerufen
+    var onStreamLatencyMeasured: ((TimeInterval) -> Void)?
+
+    /// Wird beim ersten Metadaten-Update aufgerufen
+    var onMetadataLatencyMeasured: ((TimeInterval) -> Void)?
+
+    /// Wird beim ersten Artwork-Update aufgerufen
+    var onArtworkLatencyMeasured: ((TimeInterval) -> Void)?
+
+    // interne Start-Zeitmarker
+    private var metadataStartTime: CFAbsoluteTime?                                      // Variable für Metadaten-latenzmessung
+    private var artworkStartTime: CFAbsoluteTime?                                       // Variable für Artwork-latenzmessung
+    private var playStartTime: CFAbsoluteTime?                                          // Variable für Stream-Latenzmessung
     
     //MARK: Published States
     @Published var allStations: [RadioStation] = [] {
@@ -110,11 +123,12 @@ class StationsManager: ObservableObject {
     }
 
     // MARK: - Metadatenverwaltung
-    /// Setzt Metadaten zurück, wenn kein Song läuft
+    /// Setzt Song-Metadaten zurück
     private func resetMetadata() {
         currentTrack = ""
         currentArtist = ""
         currentArtworkURL = nil
+        currentTrackURL = nil
         updateLockScreen()
     }
 
@@ -365,7 +379,7 @@ extension StationsManager {
         return combinedResults
     }
     
-    /// Behalt pro duplicateKey genau EIN Objekt (den ersten)
+    /// Behält pro duplicateKey genau EIN Objekt
     private func filterUniqueStationsByDuplicateKey(_ list: [RadioStation]) -> [RadioStation] {
         var seen = Set<String>()
         return list.filter { st in
@@ -376,8 +390,6 @@ extension StationsManager {
             return true          // Sender ohne duplicateKey nie unterdrücken
         }
     }
-
-
 }
 
 // MARK: Kategorie-spezifische Filter (.recents, .favorites)
@@ -439,7 +451,7 @@ extension StationsManager {
         // Prüft, ob ein aktueller Standort vorliegt:
         if let _ = locationManager.currentLocation {
             // Standort wurde ermittelt – normale Filterung
-            let stationsByProximity = locationManager.filterStationsByProximity(allStationsGlobal, maxDistance: 50000.0)
+            let stationsByProximity = locationManager.filterStationsByProximity(allStationsGlobal)
             print("Sender im Umkreis von 50 km: \(stationsByProximity.count)")
             
             // Versucht, Sender anhand des Bundeslandes zu filtern (falls vorhanden)
@@ -655,6 +667,12 @@ extension StationsManager {
 extension StationsManager {
     /// Setzt den ausgewählten Sender
     func set(station: RadioStation) {
+        // Marker für alle drei Messungen auf den gleichen Startzeitpunkt setzen
+        let start = CFAbsoluteTimeGetCurrent()
+        playStartTime      = start
+        metadataStartTime  = start
+        artworkStartTime   = start
+        
         // Wenn derselbe Sender erneut gewählt wird, setze den Pause-Flag zurück und starte den Sender.
         if currentStation == station {
             userDidPause = false
@@ -720,6 +738,14 @@ extension StationsManager : FRadioPlayerDelegate {
     func radioPlayer(_ player: FRadioPlayer,
                      metadataDidChange artistName: String?,
                      trackName: String?) {
+        
+        //  ◀︎ Erste Metadaten-Latenz messen
+        if let mdStart = metadataStartTime {
+        let latency = CFAbsoluteTimeGetCurrent() - mdStart
+        onMetadataLatencyMeasured?(latency)
+        metadataStartTime = nil
+        }
+        
         DispatchQueue.main.async {
             // ----------------- Artist ---------------------------------
             let displayArtist: String = {
@@ -857,6 +883,17 @@ extension StationsManager : FRadioPlayerDelegate {
     /// reagiert speziell auf Änderungen im Wiedergabezustand und aktualisiert zusätzlich die Eigenschaft isPlaying im Main-Thread, sodass die UI entsprechend reagiert.
     func radioPlayer(_ player: FRadioPlayer, playbackStateDidChange state: FRadioPlaybackState) {
         print("Playback State geändert: \(state)")
+        
+        // 3) Latenz berechnen
+        if state == .playing, let start = playStartTime {
+            let latency = CFAbsoluteTimeGetCurrent() - start
+            onStreamLatencyMeasured?(latency)
+            // hier keine extra Backslashes um die Format-Quotes:
+            let formatted = String(format: "%.3f", latency)
+            print("▶︎ Play-Latenz: \(formatted) s")
+            playStartTime = nil
+        }
+
         DispatchQueue.main.async {
             self.isPlaying = (state == .playing)
             if state == .playing || state == .paused {
@@ -870,6 +907,15 @@ extension StationsManager : FRadioPlayerDelegate {
 
     /// reagiert auf Änderungen in den Metadaten bezüglich des Albumcovers und gibt den neuen Zustand weiter, damit das neue Cover abgefragt werden kann.
     func radioPlayer(_ player: FRadioPlayer, artworkDidChange artworkURL: URL?) {
+        
+        //  ◀︎ Erste Artwork-Latenz messen
+        if let artStart = artworkStartTime {
+        let latency = CFAbsoluteTimeGetCurrent() - artStart
+        onArtworkLatencyMeasured?(latency)
+        artworkStartTime = nil
+        }
+        
+        
         DispatchQueue.main.async {
             guard let newArtworkURL = artworkURL else {
                 self.currentArtworkURL = nil
@@ -881,7 +927,7 @@ extension StationsManager : FRadioPlayerDelegate {
                 return
             }
 
-            // Falls das neue Cover nur 100x100 ist, prüfen, ob wir bereits ein besseres haben
+            // Falls das neue Cover nur 100x100 ist, prüfen, ob bereits ein besseres vorhanden ist
             if newArtworkURL.absoluteString.contains("100x100") {
 
                 if self.currentArtworkURL == nil {

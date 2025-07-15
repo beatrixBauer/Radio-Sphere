@@ -2,8 +2,6 @@
 //  RadioAPI.swift
 //  Radio_Sphere
 //
-//  Created by Beatrix Bauer on 03.04.25.
-//
 
 import Foundation
 
@@ -32,7 +30,7 @@ class RadioAPI {
         performRequest(urlString: remoteURL, completion: completion)
     }
 
-    /// Abfrage aller Stationen im Mobilfunknetzt mit limit und Pagination
+    /// Abfrage aller Stationen im Mobilfunknetz mit limit und Pagination
     func fetchStations(offset: Int, limit: Int, completion: @escaping ([RadioStation]) -> Void) {
         let remoteURL = baseURL + "/search?hidebroken=true&lastcheckok=1&is_https=true&offset=\(offset)&limit=\(limit)"
         performRequest(urlString: remoteURL, completion: completion)
@@ -100,7 +98,7 @@ class RadioAPI {
         let fallbackURLs = [
             "https://de1.api.radio-browser.info",
             "https://de2.api.radio-browser.info",
-            "https://fi1.api.radio-browser.info/"
+            "https://fi1.api.radio-browser.info"
         ]
         let hostname: CFString = "all.api.radio-browser.info" as CFString
         var streamError = CFStreamError()

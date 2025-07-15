@@ -2,18 +2,24 @@
 //  StationsManagerFilterTests.swift
 //  Radio_Sphere
 //
-//  Created by Beatrix Bauer on 06.05.25.
-//
+// Test Kategorienfilter
 
 import XCTest
 @testable import Radio_Sphere
 
 final class StationsManagerFilterTests: XCTestCase {
+    
+    // Observer beim ersten Zugriff auf die Klasse initialisieren
+    private static let summaryObserverBootstrap: Void = {
+        _ = TestSummaryObserver.shared          // registriert sich beim XCTestObservationCenter
+    }()
 
     var manager: StationsManager!
 
     override func setUp() {
         super.setUp()
+        
+        _ = StationsManagerFilterTests.summaryObserverBootstrap
         manager = StationsManager.shared
         // Resetten aller relevanten Zustände, damit Tests isoliert laufen:
         manager.allStations = []
@@ -29,6 +35,8 @@ final class StationsManagerFilterTests: XCTestCase {
         manager = nil
         super.tearDown()
     }
+    
+    
 
     // Testet, ob beim Filtern nach Kategorie-Tags nur die passenden Stationen zurückgegeben werden.
     func testFilterStationsForCategory() {

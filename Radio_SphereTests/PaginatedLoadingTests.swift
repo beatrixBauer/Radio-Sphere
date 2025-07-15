@@ -2,8 +2,7 @@
 //  PaginatedLoadingTests.swift
 //  Radio_Sphere
 //
-//  Created by Beatrix Bauer on 07.05.25.
-//
+// Test des paginierten Ladens
 
 import XCTest
 

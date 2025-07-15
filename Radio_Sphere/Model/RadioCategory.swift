@@ -2,8 +2,6 @@
 //  RadioCategory.swift
 //  Radio_Sphere
 //
-//  Created by Beatrix Bauer on 10.04.25.
-//
 
 import SwiftUICore
 
@@ -157,47 +155,6 @@ extension RadioCategory {
     }
 }
 
-// aktuell unbenutzt
-extension RadioCategory {
-    var backgroundStyle: AnyShapeStyle {
-        switch self {
-        case .pop:
-            return AnyShapeStyle(
-                LinearGradient(
-                    gradient: Gradient(colors: [Color.itunespink.opacity(0.8), Color.itunesorange.opacity(0.8)]),
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-            )
-        case .oldies:
-            return AnyShapeStyle(
-                LinearGradient(
-                    gradient: Gradient(colors: [Color.darkblue.opacity(0.8), Color.itunestuerkis.opacity(0.8)]),
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-            )
-        case .meditation:
-            return AnyShapeStyle(
-                LinearGradient(
-                    gradient: Gradient(colors: [Color.itunesorange.opacity(0.8), Color.goldorange.opacity(0.8)]),
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-            )
-        case .tradtionalMusic:
-            return AnyShapeStyle(
-                LinearGradient(
-                    gradient: Gradient(colors: [Color.ituneslila.opacity(0.8), Color.darkblue.opacity(0.8)]),
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-            )
-        default:
-            return AnyShapeStyle(Color.blue.opacity(0.2))
-        }
-    }
-}
 
 
 

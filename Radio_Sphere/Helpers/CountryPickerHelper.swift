@@ -2,8 +2,6 @@
 //  CountryPickerHelper.swift
 //  Radio Sphere
 //
-//  Created by Beatrix Bauer on 14.04.25.
-//
 
 
 struct CountryPickerHelper {

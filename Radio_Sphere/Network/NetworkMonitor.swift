@@ -2,11 +2,10 @@
 //  NetworkMonitor.swift
 //  Radio_Sphere
 //
-//  Created by Beatrix Bauer on 27.04.25.
-//
 
 import Network
 import Combine
+import Foundation
 
 /// Überprüft die Internetverbindung und veröffentlicht Statusänderungen.
 final class NetworkMonitor: ObservableObject {
@@ -48,6 +47,30 @@ final class NetworkMonitor: ObservableObject {
 
         monitor.start(queue: queue)
         print("Netzwerkmonitor gestartet.")
+        
+        
+        #if DEBUG
+        // Test-Hook: nach X Sekunden offline für Y Sekunden
+        let args = ProcessInfo.processInfo.arguments
+        if let afterIdx = args.firstIndex(of: "-UITestOfflineAfter"),
+           args.count > afterIdx + 1,
+           let after = Double(args[afterIdx + 1]),
+           let durIdx = args.firstIndex(of: "-UITestOfflineDuration"),
+           args.count > durIdx + 1,
+           let duration = Double(args[durIdx + 1]) {
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + after) { [weak self] in
+                guard let self = self else { return }
+                print("🔄 Simuliere Offline für \(duration)s")
+                self.isConnected = false
+                DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
+                    self.isConnected = true
+                    print(" Offline-Simulation beendet, Netzwerk wieder da")
+                }
+            }
+        }
+        #endif
+        
     }
 
     // MARK: - Netzwerküberwachung stoppen
